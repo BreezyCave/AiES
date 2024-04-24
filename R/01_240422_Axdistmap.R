@@ -1,5 +1,5 @@
 #' @title creating distance map and binary image from tiff image file
-#' @description \code{Axdistmap} create images of distance map and binary image (option) from tiff image files
+#' @description \code{01Axdistmap} create images of distance map and binary image (option) from tiff image files
 #' @import EBImage
 #' @import stringr
 #' @import dplyr
