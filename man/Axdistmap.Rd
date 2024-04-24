@@ -17,3 +17,6 @@ return the image of distancemap and data of features
 \description{
 \code{Axdistmap} create images of distance map and binary image (option) from tiff image files
 }
+\examples{
+# Axdistmap(Binary = FALSE, All_Features = FALSE)
+}
