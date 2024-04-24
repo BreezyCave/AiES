@@ -11,6 +11,9 @@
 #' @param Binary TRUE: exporting binary image files
 #' @param All_Features TRUE: exporting data of all features
 #' @return return the image of distancemap and data of features
+#' @export
+#' @examples
+#' # Axdistmap(Binary = FALSE, All_Features = FALSE)
 
 Axdistmap <- function( Binary = FALSE, All_Features = FALSE){
 
