@@ -1,18 +1,17 @@
 #' @title creating distance map and binary image from tiff image file
-#' @description \code{Axdistmap} create images of distance map and binary image (option) from tiff image files
+#' @description \code{Axdistmap001} create images of distance map and binary image (option) from tiff image files
 #' @import EBImage
 #' @import stringr
 #' @import dplyr
 #' @import png
 #' @import colorspace
 #' @importFrom utils write.table
-#' @param x full path or the directory name containing tiff image files of phase contrast
-#' @param CD TRUE: setting the directory "x" and "y" under the current working directory
 #' @param Binary TRUE: exporting binary image files
-#' @return return the list of file names and % area of axons
+#' @param All_Features TRUE: exporting data of all features
+#' @return return the image of distancemap and data of features
 #' @export
 #' @examples
-#' # Axdistmap("C:/Users/R", Binary = TRUE) or Axdistmap("R", CD = TRUE, Binary = TRUE)
+#' # Axdistmap001(Binary = TRUE, All_Features = TRUE)
 
 
 Axdistmap <- function( Binary = FALSE, All_Features = FALSE){
