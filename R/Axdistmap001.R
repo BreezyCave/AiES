@@ -1,21 +1,25 @@
 #' @title creating distance map and binary image from tiff image file
-#' @description \code{Axdistmap001} create images of distance map and binary image (option) from tiff image files
+#' @description \code{Axdistmap} create images of distance map and binary image (option) from tiff image files
 #' @import EBImage
 #' @import stringr
 #' @import dplyr
 #' @import png
 #' @import colorspace
 #' @importFrom utils write.table
+#' @importFrom utils choose.files
+#' @importFrom stats na.omit
 #' @param Binary TRUE: exporting binary image files
 #' @param All_Features TRUE: exporting data of all features
 #' @return return the image of distancemap and data of features
 #' @export
-#' @examples
-#' # Axdistmap001(Binary = TRUE, All_Features = TRUE)
+#' # Axdistmap(Binary = TRUE, All_Features = TRUE)
 
 
 Axdistmap <- function( Binary = FALSE, All_Features = FALSE){
 
+  num_f <- function(x){
+    x <- as.numeric(levels(x))[x]
+  }
   ######Selecting the Directory#######
   # 代表的なファイルのファイルパス
   file_path <- choose.files()
