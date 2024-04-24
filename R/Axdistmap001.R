@@ -11,12 +11,6 @@
 #' @param Binary TRUE: exporting binary image files
 #' @param All_Features TRUE: exporting data of all features
 #' @return return the image of distancemap and data of features
-#' @export
-#' # Axdistmap(Binary = TRUE, All_Features = TRUE)
-
-num_f <- function(x){
-  x <- as.numeric(levels(x))[x]
-}
 
 Axdistmap <- function( Binary = FALSE, All_Features = FALSE){
 
@@ -38,6 +32,10 @@ Axdistmap <- function( Binary = FALSE, All_Features = FALSE){
 
   ####Information of Date####
   sdate <- Sys.Date()
+
+  num_f <- function(x){
+    x <- as.numeric(levels(x))[x]
+  }
 
 
 
