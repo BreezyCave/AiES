@@ -3,8 +3,8 @@
 #' @import stringr
 #' @import png
 #' @import colorspace
-#' @import dplyr
 #' @import EBImage
+#' @import dplyr
 #' @importFrom utils write.table
 #' @importFrom utils choose.files
 #' @importFrom stats na.omit
@@ -57,17 +57,17 @@ Axdistmap <- function( Binary = FALSE, All_Features = FALSE){
       dm <- distmap(x_thr_bw)
       ddm <- normalize(dm)
       dml <- bwlabel(ddm)
-      sdat <- computeFeatures.shape(dml)
+      sdat <- as.data.frame(computeFeatures.shape(dml))
       #######Threshold for eliminating small objects that cannot be classified by image processing
       rma <- 30
       rmNum <- which(sdat$s.area <= rma)
       dml <- rmObjects(dml, rmNum)
-      sdat <- computeFeatures.shape(dml) #option with
+      sdat <- as.data.frame(computeFeatures.shape(dml)) #option with
       ####this elimination option is not included in the original program
       #colorMode(dml) <- Grayscale
 
-      hdat <- computeFeatures.haralick(dml,ddm)
-      mdat <- computeFeatures.moment(dml)
+      hdat <- as.data.frame(computeFeatures.haralick(dml,ddm))
+      mdat <- as.data.frame(computeFeatures.moment(dml))
 
       data_sht <<- data.frame(cbind( sdat, hdat, mdat))
 
