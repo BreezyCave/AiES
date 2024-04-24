@@ -3,8 +3,21 @@
 #' @import stringr
 #' @import png
 #' @import colorspace
-#' @import EBImage
-#' @importFrom dplyr mutate
+#' @importFrom EBImage readImage
+#' @importFrom EBImage resize
+#' @importFrom EBImage medianFilter
+#' @importFrom EBImage thresh
+#' @importFrom EBImage makeBrush
+#' @importFrom EBImage opening
+#' @importFrom EBImage distmap
+#' @importFrom EBImage normalize
+#' @importFrom EBImage bwlabel
+#' @importFrom EBImage computeFeatures.shape
+#' @importFrom EBImage rmObjects
+#' @importFrom EBImage rmObjects
+#' @importFrom EBImage computeFeatures.moment
+#' @importFrom EBImage computeFeatures.haralick
+#' @import dplyr
 #' @importFrom utils write.table
 #' @importFrom utils choose.files
 #' @importFrom stats na.omit
@@ -26,7 +39,7 @@ Axdistmap <- function( Binary = FALSE, All_Features = FALSE){
     str_split( "/") %>%
     unlist() %>%
     as.data.frame()  %>%
-    dplyr::mutate(level = row_number())
+    mutate(level = row_number())
   colnames(dir_info) <- c("Dir_Name", "Level")
   # 最後のファイル名を除いた部分を抽出
   Mainf <- str_c(dir_info$Dir_Name[1:(nrow(dir_info)-1)], collapse = "/")
