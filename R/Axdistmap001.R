@@ -57,14 +57,15 @@ Axdistmap <- function( Binary = FALSE, All_Features = FALSE){
       dm <- distmap(x_thr_bw)
       ddm <- normalize(dm)
       dml <- bwlabel(ddm)
+      sdat <- computeFeatures.shape(dml)
       #######Threshold for eliminating small objects that cannot be classified by image processing
       rma <- 30
       rmNum <- which(data_sht$s.area <= rma)
       dml <- rmObjects(dml, rmNum)
+      sdat <- computeFeatures.shape(dml) #option with
       ####this elimination option is not included in the original program
       #colorMode(dml) <- Grayscale
 
-      sdat <- computeFeatures.shape(dml)
       hdat <- computeFeatures.haralick(dml,ddm)
       mdat <- computeFeatures.moment(dml)
 
