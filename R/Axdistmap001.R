@@ -4,22 +4,7 @@
 #' @import png
 #' @import colorspace
 #' @import dplyr
-#' @importFrom EBImage readImage
-#' @importFrom EBImage resize
-#' @importFrom EBImage medianFilter
-#' @importFrom EBImage thresh
-#' @importFrom EBImage makeBrush
-#' @importFrom EBImage opening
-#' @importFrom EBImage distmap
-#' @importFrom EBImage normalize
-#' @importFrom EBImage bwlabel
-#' @importFrom EBImage computeFeatures.shape
-#' @importFrom EBImage rmObjects
-#' @importFrom EBImage rmObjects
-#' @importFrom EBImage computeFeatures.moment
-#' @importFrom EBImage computeFeatures.haralick
-#' @importFrom EBImage Image
-#' @importFrom EBImage colorMode
+#' @import EBImage
 #' @importFrom utils write.table
 #' @importFrom utils choose.files
 #' @importFrom stats na.omit
