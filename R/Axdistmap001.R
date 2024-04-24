@@ -3,6 +3,7 @@
 #' @import stringr
 #' @import png
 #' @import colorspace
+#' @import dplyr
 #' @importFrom EBImage readImage
 #' @importFrom EBImage resize
 #' @importFrom EBImage medianFilter
@@ -17,7 +18,8 @@
 #' @importFrom EBImage rmObjects
 #' @importFrom EBImage computeFeatures.moment
 #' @importFrom EBImage computeFeatures.haralick
-#' @import dplyr
+#' @importFrom EBImage Image
+#' @importFrom EBImage colorMode
 #' @importFrom utils write.table
 #' @importFrom utils choose.files
 #' @importFrom stats na.omit
@@ -58,29 +60,29 @@ Axdistmap <- function( Binary = FALSE, All_Features = FALSE){
   is.tif <- function(x) regexpr('\\.tif$', x) + regexpr('\\.tiff$', x)> 0
 
   for (file_list.name in list.files()[is.tif(list.files())]){
-      test <- EBImage::readImage(file_list.name)
-      test <- EBImage::resize(test, w = 900)#15Jun11:696 22Apr15:900
+      test <- readImage(file_list.name)
+      test <- resize(test, w = 900)#15Jun11:696 22Apr15:900
       test_s <- (1/(1+(0.5/test[,,1])^5))
-      mf1 <- EBImage::medianFilter(test_s,1)
+      mf1 <- medianFilter(test_s,1)
       x_mf1 <- (log1p(mf1)/log1p(max(mf1)))
       x_mf1_log <- (log1p(x_mf1)/log1p(max(x_mf1)))
-      x_thr <- EBImage::thresh(x_mf1_log, 8, 8, -0.04)
-      kern <- EBImage::makeBrush(1, shape="box")
-      x_thr_bw <- 1 - EBImage::opening(closing(x_thr, kern), kern)
-      dm <- EBImage::distmap(x_thr_bw)
-      ddm <- EBImage::normalize(dm)
-      dml <- EBImage::bwlabel(ddm)
-      sdat <- EBImage::computeFeatures.shape(dml)
+      x_thr <- thresh(x_mf1_log, 8, 8, -0.04)
+      kern <- makeBrush(1, shape="box")
+      x_thr_bw <- 1 - opening(closing(x_thr, kern), kern)
+      dm <- distmap(x_thr_bw)
+      ddm <- normalize(dm)
+      dml <- bwlabel(ddm)
+      sdat <- computeFeatures.shape(dml)
       #######Threshold for eliminating small objects that cannot be classified by image processing
       rma <- 30
       rmNum <- which(sdat$s.area <= rma)
-      dml <- EBImage::rmObjects(dml, rmNum)
-      sdat <- EBImage::computeFeatures.shape(dml) #option with
+      dml <- rmObjects(dml, rmNum)
+      sdat <- computeFeatures.shape(dml) #option with
       ####this elimination option is not included in the original program
       #colorMode(dml) <- Grayscale
 
-      hdat <- EBImage::computeFeatures.haralick(dml,ddm)
-      mdat <- EBImage::computeFeatures.moment(dml)
+      hdat <- computeFeatures.haralick(dml,ddm)
+      mdat <- computeFeatures.moment(dml)
 
       data_sht <<- data.frame(cbind( sdat, hdat, mdat))
 
