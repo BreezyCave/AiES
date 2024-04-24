@@ -57,6 +57,11 @@ Axdistmap <- function( Binary = FALSE, All_Features = FALSE){
       dm <- distmap(x_thr_bw)
       ddm <- normalize(dm)
       dml <- bwlabel(ddm)
+      #######Threshold for eliminating small objects that cannot be classified by image processing
+      rma <- 30
+      rmNum <- which(data_sht$s.area <= rma)
+      dml <- rmObjects(dml, rmNum)
+      ####this elimination option is not included in the original program
       #colorMode(dml) <- Grayscale
 
       sdat <- computeFeatures.shape(dml)
@@ -75,16 +80,12 @@ Axdistmap <- function( Binary = FALSE, All_Features = FALSE){
       #sdat0 <- as.data.frame(computeFeatures.shape(dml))#When performing this step, an error may occur due to the file size being too large
       ##sdat <- as.data.frame(computeFeatures.shape(dmrmal))#When performing this step, an error may occur due to the file size being too large
 
-      #######Threshold for eliminating small objects that cannot be classified by image processing
-      rma <- 30
-      rmNum <- which(sdat0$s.area <= rma)
-      dmlrma <- rmObjects(dml, rmNum)
       if (Binary == TRUE){
-        dmrmabw <- 1*(dmlrma > 0)# binary image
+        dmrmabw <- 1*(dml > 0)# binary image
         file.name <- paste0(sdate, file_list.name, "_Binary.png")
         writePNG(dmrmabw,file.name)
       }
-      ddmrmadm <- ddm*(dmlrma > 0)# distance map
+      ddmrmadm <- ddm*(dml > 0)# distance map
       file.name <- paste0(sdate, file_list.name, "_DistMap.png")
       writePNG(ddmrmadm,file.name)
       dmrmal <- bwlabel(ddmrmadm)
@@ -100,9 +101,8 @@ Axdistmap <- function( Binary = FALSE, All_Features = FALSE){
 
 
       if (exists('data_sh') == FALSE) {
-        data_sh <- data.frame(cbind("File" = file_list.name, "Object size percentage" = sum(sdat$s.area)/(dim(ddmrmadm)[1]*dim(ddmrmadm)[2])*100))
       } else {
-        data_sh <- rbind(data_sh, data.frame(cbind("File" = file_list.name,  "Object size percentage" = sum(sdat$s.area)/(dim(ddmrmadm)[1]*dim(ddmrmadm)[2])*100)))
+        data_sh <- rbind(data_sh, data.frame(cbind("File" = file_list.name,  "Object size percentage" = sum(data_sht$s.area)/(dim(ddmrmadm)[1]*dim(ddmrmadm)[2])*100)))
       }
   }
       write.table(data_sh, paste0(sdate,"_Area.txt"),sep="\t",row.names=FALSE, quote=F, col.names=TRUE, append=FALSE)
