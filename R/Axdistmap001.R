@@ -14,12 +14,12 @@
 #' @export
 #' # Axdistmap(Binary = TRUE, All_Features = TRUE)
 
+num_f <- function(x){
+  x <- as.numeric(levels(x))[x]
+}
 
 Axdistmap <- function( Binary = FALSE, All_Features = FALSE){
 
-  num_f <- function(x){
-    x <- as.numeric(levels(x))[x]
-  }
   ######Selecting the Directory#######
   # 代表的なファイルのファイルパス
   file_path <- choose.files()
