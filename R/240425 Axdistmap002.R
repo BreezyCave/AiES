@@ -1,7 +1,6 @@
 #' @title creating distance map and binary image from tiff image file
 #' @description \code{Axdistmap} create images of distance map and binary image (option) from tiff image files
 #' @import stringr
-#' @import png
 #' @import colorspace
 #' @import EBImage
 #' @import dplyr
@@ -10,12 +9,14 @@
 #' @importFrom stats na.omit
 #' @param Binary TRUE: exporting binary image files
 #' @param All_Features TRUE: exporting data of all features
+#' @param Type png, jpg, tiff
 #' @return return the image of distancemap and data of features
 #' @export
 #' @examples
-#' # Axdistmap(Binary = FALSE, All_Features = FALSE)
+#' # Axdistmap(Binary = FALSE, All_Features = FALSE, Type = tiff)
 
-Axdistmap <- function( Binary = FALSE, All_Features = FALSE){
+
+Axdistmap <- function( Binary = FALSE, All_Features = FALSE, Type = "tiff"){
 
   ######Selecting the Directory#######
   # 代表的なファイルのファイルパス
@@ -45,6 +46,18 @@ Axdistmap <- function( Binary = FALSE, All_Features = FALSE){
   is.tif <- function(x) regexpr('\\.tif$', x) + regexpr('\\.tiff$', x)> 0
 
   for (file_list.name in list.files()[is.tif(list.files())]){
+      #####################
+      #test code for debug
+      #sdate <- Sys.Date()
+
+      #num_f <- function(x){
+      #x <- as.numeric(levels(x))[x]
+      #}
+      #file_list.name <- choose.files()
+      #Binary = "TRUE"
+      #All_Features = "TRUE"
+      #Type = "jpg"
+      #####################
       test <- readImage(file_list.name)
       test <- resize(test, w = 900)#15Jun11:696 22Apr15:900
       test_s <- (1/(1+(0.5/test[,,1])^5))
@@ -65,47 +78,90 @@ Axdistmap <- function( Binary = FALSE, All_Features = FALSE){
       sdat <- as.data.frame(computeFeatures.shape(dml)) #option with
       ####this elimination option is not included in the original program
       #colorMode(dml) <- Grayscale
+      ######Required ddm for caluculating haralick texture feature.
+      ######However, the numbers of objects are different between them.
+
 
       hdat <- as.data.frame(computeFeatures.haralick(dml,ddm))
       mdat <- as.data.frame(computeFeatures.moment(dml))
 
-      data_sht <<- data.frame(cbind( sdat, hdat, mdat))
+      #
+      #
+      #sing_data <- data.frame(cbind("FileName" = file_list.name, sdat, hdat, mdat))
+      sing_data <- data.frame(cbind(sdat, hdat, mdat))
+      #if (nrow(sing_data)> NumPic) {
+      #  sing_data <- sing_data[sample(nrow(sing_data), NumPic),]
+      #}
+      #if (exists('data_sh') == FALSE) {
+      #  data_sh <<- sing_data
+      #} else {
+      #  data_sh <<- rbind(data_sh, sing_data)
+      #}
+
 
 
       invisible({rm(list=c("sdat", "hdat", "mdat"));gc();gc()})
-      data_sht <- na.omit(data_sht)
+      data_sht <- na.omit(sing_data)
       if (is.numeric(data_sht[,1]) == FALSE){
         data_sht <- sapply(data_sht,num_f)
       }
+
+
+      #####export data file
+      write.table(data_sht, paste0(file_list.name,sdate,"_AllFeatures.txt"),sep="\t",row.names=FALSE, quote=F, col.names=TRUE, append=FALSE)
+      return(data_sh)
+
 
       #sdat0 <- as.data.frame(computeFeatures.shape(dml))#When performing this step, an error may occur due to the file size being too large
       ##sdat <- as.data.frame(computeFeatures.shape(dmrmal))#When performing this step, an error may occur due to the file size being too large
 
       if (Binary == TRUE){
-        dmrmabw <- 1*(dml > 0)# binary image
-        file.name <- paste0(sdate, file_list.name, "_Binary.png")
-        writePNG(dmrmabw,file.name)
+        dmrmabw <- 1*(dml > 0)# %>% # binary image
+        #rotate( angle = -90) %>%
+        #flop()
+        if(Type == c("png")){
+          file.name <- paste0( file_list.name,sdate, "_Binary.png")
+          writeImage(dmrmabw, file.name,type = "png",quality = 100)
+        }else if(Type == c("jpg")){
+          file.name <- paste0(file_list.name,sdate,  "_Binary.jpg")
+          writeImage(dmrmabw, file.name,type = "jpg",quality = 100)
+        }else{
+          file.name <- paste0( file_list.name,sdate, "_Binary.tiff")
+          writeImage(dmrmabw, file.name,type = "tiff",quality = 100)
+        }
       }
-      ddmrmadm <- ddm*(dml > 0)# distance map
-      file.name <- paste0(sdate, file_list.name, "_DistMap.png")
-      writePNG(ddmrmadm,file.name)
-      dmrmal <- bwlabel(ddmrmadm)
-      colorMode(dmrmal) <- Grayscale
+      ddmrmadm <- ddm*(dml > 0)# %>% # distance map
+      #rotate( angle = -90) %>%
+      #flop()
+      if(Type == c("png")){
+        file.name <- paste0(file_list.name,sdate,  "_DistMap.png")
+        writeImage(ddmrmadm, file.name,type = "png",quality = 100)
+      }else if(Type == c("jpg")){
+        file.name <- paste0( file_list.name,sdate, "_DistMap.jpg")
+        writeImage(ddmrmadm, file.name,type = "jpg",quality = 100)
+      }else{
+        file.name <- paste0( file_list.name,sdate, "_DistMap.tiff")
+        writeImage(ddmrmadm, file.name,type = "tiff",quality = 100)
+      }
 
-      cols = c('black', sample(heat_hcl(max(dmrmal))))
-      dHeat = Image(cols[1+dmrmal], dim=dim(dmrmal))
-      file.name <- paste0(sdate, file_list.name, "_Color.png")
-      writePNG(dHeat,file.name)
+
+      #dmrmal <- bwlabel(ddmrmadm)
+      #colorMode(dmrmal) <- Grayscale
+
+      #cols = c('black', sample(heat_hcl(max(dmrmal))))
+      #dHeat = Image(cols[1+dmrmal], dim=dim(dmrmal))
+      #file.name <- paste0(sdate, file_list.name, "_Color.png")
+      #writePNG(dHeat,file.name)
       ##############################
 
       ##sdat <- as.data.frame(computeFeatures.shape(dmrmal))#When performing this step, an error may occur due to the file size being too large
 
 
-      if (exists('data_sh') == FALSE) {
-      } else {
-        data_sh <- rbind(data_sh, data.frame(cbind("File" = file_list.name,  "Object size percentage" = sum(data_sht$s.area)/(dim(ddmrmadm)[1]*dim(ddmrmadm)[2])*100)))
-      }
+      #if (exists('data_sh') == FALSE) {
+      #} else {
+      #  data_sh <- rbind(data_sh, data.frame(cbind("File" = file_list.name,  "Object size percentage" = sum(data_sht$s.area)/(dim(ddmrmadm)[1]*dim(ddmrmadm)[2])*100)))
+      #}
   }
-      write.table(data_sh, paste0(sdate,"_Area.txt"),sep="\t",row.names=FALSE, quote=F, col.names=TRUE, append=FALSE)
-      return(data_sh)
+      #write.table(data_sh, paste0(sdate,"_Area.txt"),sep="\t",row.names=FALSE, quote=F, col.names=TRUE, append=FALSE)
+      #return(data_sh)
 }
