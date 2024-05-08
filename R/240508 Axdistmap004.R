@@ -2,8 +2,8 @@
 #' @description \code{Axdistmap} create images of distance map and binary image (option) from tiff image files
 #' @import stringr
 #' @import colorspace
-#' @import EBImage
 #' @import dplyr
+#' @importFrom EBImage readImage resize medianFilter thresh makeBrush opening closing distmap bwlabel computeFeatures.shape computeFeatures.haralick computeFeatures.moment writeImage
 #' @importFrom utils write.table
 #' @importFrom utils choose.files
 #' @importFrom stats na.omit
@@ -13,11 +13,27 @@
 #' @return return the image of distancemap and data of features
 #' @export
 #' @examples
-#' # Axdistmap(Binary = FALSE, All_Features = FALSE, Type = tiff)
+#' # Axdistmap(Binary = F  ALSE, All_Features = FALSE, Type = tiff)
 
 
-Axdistmap <- function( Binary = FALSE, All_Features = FALSE, Type = "tiff"){
+Axdistmap <- function(Sub_Back = FALSE, Binary = FALSE, All_Features = FALSE, Type = "tiff"){
 
+  #### #test code for debug
+  #library("EBImage")
+  #library("stringr")
+  #library("colorspace")
+  #library("EBImage")
+  #library("dplyr")
+  #Sub_Back = "FALSE"
+  #Binary = "TRUE"
+  #All_Features = "TRUE"
+  #Type = "tiff"
+  #########################
+
+  sdate <- Sys.Date()
+  num_f <- function(x){
+    x <- as.numeric(levels(x))[x]
+  }
   ######Selecting the Directory#######
   # 代表的なファイルのファイルパス
   file_path <- choose.files()
@@ -34,18 +50,23 @@ Axdistmap <- function( Binary = FALSE, All_Features = FALSE, Type = "tiff"){
   setwd(Mainf)#Low probability of error due to direct selecting a file through dialogue box
   ######Selecting the Directory#######
 
-  ####Information of Date####
-  sdate <- Sys.Date()
 
-  num_f <- function(x){
-    x <- as.numeric(levels(x))[x]
-  }
-
-
+  #####################
+  # ディレクトリ情報の抽出
+  #file_info <- str_replace_all(file_list.name, pattern = "\\\\", replacement="/") %>%
+  #str_split( "/") %>%
+  #unlist() %>%
+  #as.data.frame()  %>%
+  #mutate(level = row_number())
+  #colnames(file_info) <- c("Dir_Name", "Level")
+  ###################
 
   is.tif <- function(x) regexpr('\\.tif$', x) + regexpr('\\.tiff$', x)> 0
 
-  for (file_list.name in list.files()[is.tif(list.files())]){
+  ####Information of Date####
+
+
+    for (file_list.name in list.files()[is.tif(list.files())]){
       #####################
       #test code for debug
       #sdate <- Sys.Date()
@@ -53,11 +74,7 @@ Axdistmap <- function( Binary = FALSE, All_Features = FALSE, Type = "tiff"){
       #num_f <- function(x){
       #x <- as.numeric(levels(x))[x]
       #}
-      #file_list.name <- choose.files()
-      #Binary = "TRUE"
-      #All_Features = "TRUE"
-      #Type = "jpg"
-      #####################
+
       test <- readImage(file_list.name)
       test <- resize(test, w = 900)#15Jun11:696 22Apr15:900
       test_s <- (1/(1+(0.5/test[,,1])^5))
@@ -72,10 +89,12 @@ Axdistmap <- function( Binary = FALSE, All_Features = FALSE, Type = "tiff"){
       dml <- bwlabel(ddm)
       sdat <- as.data.frame(computeFeatures.shape(dml))
       #######Threshold for eliminating small objects that cannot be classified by image processing
+      if(Sub_Back == TRUE){
       rma <- 30
       rmNum <- which(sdat$s.area <= rma)
       dml <- rmObjects(dml, rmNum)
       sdat <- as.data.frame(computeFeatures.shape(dml)) #option with
+      }
       ####this elimination option is not included in the original program
       #colorMode(dml) <- Grayscale
       ######Required ddm for caluculating haralick texture feature.
@@ -89,6 +108,26 @@ Axdistmap <- function( Binary = FALSE, All_Features = FALSE, Type = "tiff"){
       #
       #sing_data <- data.frame(cbind("FileName" = file_list.name, sdat, hdat, mdat))
       sing_data <- data.frame(cbind(sdat, hdat, mdat))
+      invisible({rm(list=c("sdat", "hdat", "mdat"));gc();gc()})
+      data_sht <- na.omit(sing_data)
+      if (is.numeric(data_sht[,1]) == FALSE){
+        data_sht <- sapply(data_sht,num_f)
+      }
+
+      if(All_Features == FALSE){
+          data_sht <- data.frame(s.area = data_sht$s.area,
+                               m.eccentricity = data_sht$m.eccentricity,
+                               s.radius.sd = data_sht$s.radius.sd,
+                               h.sva.s2 = data_sht$h.sva.s2,
+                               h.idm.s1 = data_sht$h.idm.s1,
+                               h.sen.s1 = data_sht$h.sen.s1,
+                               m.majoraxis = data_sht$m.majoraxis,
+                                stringsAsFactors = TRUE)
+      }else {
+        data_sht <<- data.frame(cbind(data_sht,Cir = data_sht$s.area*pi*4/data_sht$s.perimeter^2) , stringsAsFactors = TRUE)
+
+      }
+
       #if (nrow(sing_data)> NumPic) {
       #  sing_data <- sing_data[sample(nrow(sing_data), NumPic),]
       #}
@@ -100,16 +139,11 @@ Axdistmap <- function( Binary = FALSE, All_Features = FALSE, Type = "tiff"){
 
 
 
-      invisible({rm(list=c("sdat", "hdat", "mdat"));gc();gc()})
-      data_sht <- na.omit(sing_data)
-      if (is.numeric(data_sht[,1]) == FALSE){
-        data_sht <- sapply(data_sht,num_f)
-      }
-
 
       #####export data file
-      write.table(data_sht, paste0(file_list.name,sdate,"_AllFeatures.txt"),sep="\t",row.names=FALSE, quote=F, col.names=TRUE, append=FALSE)
-      return(data_sh)
+      write.table(data_sht, paste0(file_list.name,sdate,"_AllFeatures.txt"),
+                  sep="\t",row.names=FALSE, quote=F, col.names=TRUE, append=FALSE)
+      #return(data_sht)
 
 
       #sdat0 <- as.data.frame(computeFeatures.shape(dml))#When performing this step, an error may occur due to the file size being too large
