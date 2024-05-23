@@ -47,7 +47,8 @@ Axsvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
 
   ######Selecting the Directory1#######
   # file full path
-    file_path1 <- choose.files(caption = "Select one or more files to set the directory (degenerate condition) ")
+    file_path1 <- choose.files(caption = "Select file to set the directory (degenerate condition) ",
+                               multi=FALSE)
 
     if (length(file_path1)==0) {
       cat("File not selected.\n")
@@ -62,7 +63,8 @@ Axsvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
 
   ######Selecting the Directory2#######
   # file full path
-  file_path2 <- choose.files(caption = "Select one or more files to set the directory (intact condition) ")
+  file_path2 <- choose.files(caption = "Select file to set the directory (intact condition) ",
+                             multi=FALSE)
 
   if (length(file_path2)==0) {
     cat("File not selected.\n")
@@ -82,7 +84,7 @@ Axsvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
 
 ###############Create training date####
 
-  if (exists('Data_sh') == TRUE) invisible({rm(Data_sh);gc();gc()})
+  #if (exists('Data_sh') == TRUE) invisible({rm(Data_sh);gc();gc()})
   for (i in 1:2) {
       setwd(Mainf[i])
     for (file_list.name in list.files()[is.txt(list.files())]){
