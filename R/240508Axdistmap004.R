@@ -7,7 +7,7 @@
 #' @importFrom utils write.table
 #' @importFrom utils choose.files
 #' @importFrom stats na.omit
-#' @param Sub_Back TRUE: subtract background under 30 pixels
+#' @param Sub_Back TRUE: subtract background objects (under 30 pixels)
 #' @param Binary TRUE: exporting binary image files
 #' @param All_Features TRUE: exporting data of all features
 #' @param Type png, jpg, tiff

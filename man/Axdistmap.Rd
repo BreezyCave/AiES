@@ -7,7 +7,7 @@
 Axdistmap(Sub_Back = TRUE, Binary = FALSE, All_Features = FALSE, Type = "tiff")
 }
 \arguments{
-\item{Sub_Back}{TRUE: subtract background under 30 pixels}
+\item{Sub_Back}{TRUE: subtract background objects (under 30 pixels)}
 
 \item{Binary}{TRUE: exporting binary image files}
 
