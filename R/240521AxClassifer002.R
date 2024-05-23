@@ -1,5 +1,5 @@
 #' @title creating a classifer based on SVM-based machine learning
-#' @description \code{AxClassifer} create a classifer
+#' @description \code{Axsvm} create a classifer
 #' @import stringr
 #' @import dplyr
 #' @importFrom e1071 svm
@@ -14,10 +14,10 @@
 #' @return return the svm model and test data
 #' @export
 #' @examples
-#' # AxClassifer(Image = TRUE, nCst = 3, nGmm = 0.1, nCrss=5)
+#' # Axsvm(Image = TRUE, nCst = 3, nGmm = 0.1, nCrss=5)
 
 
-AxClassifer <- function(Image = TRUE, nCst = 3, nGmm = 0.1, nCrss=5){
+Axsvm <- function(Image = TRUE, nCst = 3, nGmm = 0.1, nCrss=5){
 
 ######################Codes for test run
 #  library("dplyr")
@@ -80,6 +80,7 @@ AxClassifer <- function(Image = TRUE, nCst = 3, nGmm = 0.1, nCrss=5){
     AiES::Axdistmap(Mainf[1], Sub_Back = TRUE, Binary = FALSE, All_Features = FALSE, Type = "tiff")
     AiES::Axdistmap(Mainf[2], Sub_Back = TRUE, Binary = FALSE, All_Features = FALSE, Type = "tiff")
   }
+  #####################################
 
   txt_Group <- c("Degenerate","Intact")
   Ftr.tmp <- c("Group","m.eccentricity","s.radius.sd","h.sva.s2","h.idm.s1","h.sen.s1","m.majoraxis")
