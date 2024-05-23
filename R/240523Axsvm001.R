@@ -7,7 +7,6 @@
 #' @importFrom utils write.table
 #' @importFrom utils choose.files
 #' @importFrom utils read.table
-#' @param Image TRUE: subtract background objects (under 30 pixels)
 #' @param nCst 3: cost parameter for libsvm
 #' @param nGmm 0.1: gamma parameter for libsvm
 #' @param nCrss 5: number of K-fold cross-validation
@@ -17,7 +16,7 @@
 #' # Axsvm(Image = TRUE, nCst = 3, nGmm = 0.1, nCrss=5)
 
 
-Axsvm <- function(Image = TRUE, nCst = 3, nGmm = 0.1, nCrss=5){
+Axsvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
 
 ######################Codes for test run
 #  library("dplyr")
@@ -76,11 +75,7 @@ Axsvm <- function(Image = TRUE, nCst = 3, nGmm = 0.1, nCrss=5){
   #####################################
   }
 
-  if(Image == TRUE){
-    AiES::Axdistmap(Mainf[1], Sub_Back = TRUE, Binary = FALSE, All_Features = FALSE, Type = "tiff")
-    AiES::Axdistmap(Mainf[2], Sub_Back = TRUE, Binary = FALSE, All_Features = FALSE, Type = "tiff")
-  }
-  #####################################
+###############Definition of variable######################
 
   txt_Group <- c("Degenerate","Intact")
   Ftr.tmp <- c("Group","m.eccentricity","s.radius.sd","h.sva.s2","h.idm.s1","h.sen.s1","m.majoraxis")
