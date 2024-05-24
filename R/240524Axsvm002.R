@@ -86,7 +86,7 @@ Axsvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
 
   tryCatch({
     if(exists('Data_sh') == TRUE) invisible({rm(Data_sh);gc();gc()})
-    }condition = function(c){
+    },condition = function(c){
       cat("Object 'Data_sh' deleted\n")
     })
 
