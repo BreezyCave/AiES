@@ -1,7 +1,7 @@
 Package: AiES
 Type: Package
 Title: Axon Integrity Evaluation System
-Version: 0.1.1
+Version: 1.0.0
 Author: Shinji TOKUNAGA 
 Maintainer: The package maintainer <s.toku@nemro.jp>
 Description: More about what it does (maybe more than one line)

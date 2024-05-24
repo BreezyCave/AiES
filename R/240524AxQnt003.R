@@ -74,13 +74,13 @@ AxQnt <- function(imprt_IMG = TRUE, Sub_Back = 30, exp_SIP = TRUE){
   # file full path
   file_path1 <- choose.files(caption = "Select a SVM model",
                                multi=FALSE)
-  dir_info1 <- dir_info(file_path1)
-  colnames(dir_info1) <- c("Dir_Name", "Level")
   if (length(file_path1)==0) {
     cat("File not selected.\n")
     return()##Error countermeasure code
   }else{
     tryCatch({
+      dir_info1 <- dir_info(file_path1)
+      colnames(dir_info1) <- c("Dir_Name", "Level")
       svm_model_loaded = load(file_path1)
     }, error = function(e){
       cat(" Error in load file '",
