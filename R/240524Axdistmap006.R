@@ -38,21 +38,31 @@ Axdistmap <- function(Sub_Back = 30, Binary = FALSE, All_Features = FALSE, Type 
     x <- as.numeric(levels(x))[x]
   }
   is.tif <- function(x) regexpr('\\.tif$', x) + regexpr('\\.tiff$', x)> 0
+  ####function to extract dir_info
+  dir_info <- function(x){
+    str_replace_all(x, pattern = "\\\\", replacement="/") %>%
+      str_split( "/") %>%
+      unlist() %>%
+      as.data.frame()  %>%
+      mutate(level = row_number())
+  }
+
+
   ######Selecting the Directory#######
   file_path <- choose.files(caption = "Select any file to set the directory",
                             multi=FALSE)
 
 
+  if (length(file_path)==0) {
+    cat("File not selected.\n")
+    return()##Error countermeasure code
+  }
+  while(length(file_path)!=0){
+    # extract directory info from the selected file
+    dir_info <- dir_info(file_path)
+    colnames(dir_info) <- c("Dir_Name", "Level")
+    setwd(str_c(dir_info$Dir_Name[1:(nrow(dir_info)-1)], collapse = "/"))
 
-  ######Selecting the Directory#######
-  dir_info <- str_replace_all(file_path, pattern = "\\\\", replacement="/") %>%
-    str_split( "/") %>%
-    unlist() %>%
-    as.data.frame()  %>%
-    mutate(level = row_number())
-  colnames(dir_info) <- c("Dir_Name", "Level")
-  Mainf <- str_c(dir_info$Dir_Name[1:(nrow(dir_info)-1)], collapse = "/")
-  setwd(Mainf)
 
     for (file_list.name in list.files()[is.tif(list.files())]){
 
@@ -134,6 +144,8 @@ Axdistmap <- function(Sub_Back = 30, Binary = FALSE, All_Features = FALSE, Type 
         print(file.name)
       }
 
-
+    }
+    file_path <- choose.files(caption = "Select any file to set the directory",
+                                multi=FALSE)
   }
 }

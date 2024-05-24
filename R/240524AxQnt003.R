@@ -202,10 +202,10 @@ AxQnt <- function(imprt_IMG = TRUE, Sub_Back = 30, exp_SIP = TRUE){
     }
 
 
-    if (length(file_path2)==0) {
-      cat("File not selected.\n")
-      return()##Error countermeasure code
-    }
+#    if (length(file_path2)==0) {
+#      cat("File not selected.\n")
+#      return()##Error countermeasure code
+#    }
   }
 
 }#####end of function
