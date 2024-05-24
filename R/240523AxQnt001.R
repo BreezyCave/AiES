@@ -168,6 +168,7 @@ AxQnt <- function(imprt_IMG = TRUE, Sub_Back = 30, exp_SIP = TRUE){
       Data_sh <- read.table(file_list.name, header=T, sep="\t")
       if(! FALSE %in% (Ftr.svm %in% colnames(Data_sh))){
         Pred <- svm_model_loaded %>%
+          get() %>%
           predict(Data_sh, type="class", probability = FALSE) %>%
           as.character()
         if(exp_SIP == TRUE){
