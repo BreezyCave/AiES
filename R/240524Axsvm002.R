@@ -23,16 +23,20 @@ Axsvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
 #  library("e1071")
 #  library("stringr")
 #  library("ggpubr")
-
 #  Image = TRUE
 #  nCst = 3
 #  nGmm = 0.1
 #  nCrss=5
+#######################################
 
 
-########################################
+  ##############Definition of variable######################
+
+  txt_Group <- c("Degenerate","Intact")
+  Ftr.tmp <- c("Group","m.eccentricity","s.radius.sd","h.sva.s2","h.idm.s1","h.sen.s1","m.majoraxis")
   sdate <- Sys.Date()
 
+  ###############Definition of function######################
   is.txt <- function(x) regexpr('\\.txt$', x) > 0
   ####function to extract dir_info
   dir_info <- function(x){
@@ -77,14 +81,15 @@ Axsvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
   #####################################
   }
 
-###############Definition of variable######################
-
-  txt_Group <- c("Degenerate","Intact")
-  Ftr.tmp <- c("Group","m.eccentricity","s.radius.sd","h.sva.s2","h.idm.s1","h.sen.s1","m.majoraxis")
 
 ###############Create training date####
 
-  #if (exists('Data_sh') == TRUE) invisible({rm(Data_sh);gc();gc()})
+  tryCatch({
+    if(exists('Data_sh') == TRUE) invisible({rm(Data_sh);gc();gc()})
+    }condition = function(c){
+      cat("Object 'Data_sh' deleted\n")
+    })
+
   for (i in 1:2) {
       setwd(Mainf[i])
     for (file_list.name in list.files()[is.txt(list.files())]){
@@ -102,29 +107,8 @@ Axsvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
   }
 ########################################
 
-
-##########################################
-###Match the sample size of the two groups
-  group_counts <- table(Data_sh$Group)
-  min_group <- names(which.min(group_counts))
-  filtered_min <- Data_sh[Data_sh$Group == min_group, ]
-
-  min_counts <- group_counts[names(which.min(group_counts))]
-  max_group <- names(which.max(group_counts))
-  nrm_rows <- group_counts[names(which.max(group_counts))]-group_counts[names(which.min(group_counts))]
-  major_group <- Data_sh$Group == max_group
-  rm_rows <- sample(which(major_group), nrm_rows)
-
-  #filtered_max <- sample(Data_sh[Data_sh$Group == max_group, ], min_counts)
-  Data_sht <- Data_sh[!(major_group & row.names(Data_sh) %in% rm_rows),]
-##########################################
-
-
-
-
-
 ##################delete unnecssary columns
-  data_svm <- Data_sht[ which(colnames(Data_sht) %in% Ftr.tmp)]
+  data_svm <- Data_sh[ which(colnames(Data_sh) %in% Ftr.tmp)]
 ###########################################
 
 
@@ -157,6 +141,8 @@ Axsvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
   ######Selecting the Directory1#######
   # file full path
   file_path3 <- choose.files(default = paste0(sdate,"_Extracted_data_for_ML.txt") ,caption = "Save a extracted data file", multi = FALSE)
+  dir_info3 <- dir_info(file_path3)
+  colnames(dir_info3) <- c("Dir_Name", "Level")
 
   if (length(file_path3)==0) {
     cat("Canceled \n")
@@ -164,6 +150,7 @@ Axsvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
   }else{
     write.table(data_svm, file_path3,
                 sep="\t",row.names=FALSE, quote=F, col.names=TRUE, append=FALSE)
+    print(dir_info3$Dir_Name[nrow(dir_info3)])
   }
 
 

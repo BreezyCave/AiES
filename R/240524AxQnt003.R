@@ -39,6 +39,7 @@ AxQnt <- function(imprt_IMG = TRUE, Sub_Back = 30, exp_SIP = TRUE){
   Ftr.tmp <- c("Group","m.eccentricity","s.radius.sd","h.sva.s2","h.idm.s1","h.sen.s1","m.majoraxis")
   Ftr.svm <- c("m.eccentricity","s.radius.sd","h.sva.s2","h.idm.s1","h.sen.s1","m.majoraxis")
   Rlt.name <- c("FileName","AxII","DegI")
+  sdate <- Sys.Date()
 
   ###############Definition of function######################
   CreateEmptyDF = function( nrow, ncol, colnames = c() ){
@@ -47,11 +48,6 @@ AxQnt <- function(imprt_IMG = TRUE, Sub_Back = 30, exp_SIP = TRUE){
     }
     data.frame( matrix( vector(), nrow, ncol, dimnames = list( c(), colnames ) ) )
   }
-
-
-
-########################################
-  sdate <- Sys.Date()
 
   is.txt <- function(x) regexpr('\\.txt$', x) > 0
   is.tif <- function(x) regexpr('\\.tif$', x) + regexpr('\\.tiff$', x)> 0
@@ -67,6 +63,9 @@ AxQnt <- function(imprt_IMG = TRUE, Sub_Back = 30, exp_SIP = TRUE){
       as.data.frame()  %>%
       mutate(level = row_number())
   }
+
+
+
   ################################
 
 
@@ -159,6 +158,7 @@ AxQnt <- function(imprt_IMG = TRUE, Sub_Back = 30, exp_SIP = TRUE){
         #####export data file
         write.table(data_sht, paste0(file_list.name,sdate,"_ImageData.txt"),
                     sep="\t",row.names=FALSE, quote=F, col.names=TRUE, append=FALSE)
+        print(paste0(file_list.name,sdate,"_ImageData.txt"))
       }
     }
 
@@ -175,6 +175,7 @@ AxQnt <- function(imprt_IMG = TRUE, Sub_Back = 30, exp_SIP = TRUE){
           write.table(data.frame(Pred = Pred,Data_sh),
                     paste0(file_list.name, "_", sdate,"_SIP.csv"),
                     sep=",",row.names=FALSE, quote=F, col.names=TRUE, append=FALSE)
+          print(paste0(file_list.name, "_", sdate,"_SIP.csv"))
         }
         AxII <- sum((Pred %in% txt_Group[2])*Data_sh$s.area)/(sum((Pred %in% txt_Group[2])*Data_sh$s.area)+sum((Pred %in% txt_Group[1])*Data_sh$s.area))
         DegI <- sum((Pred %in% txt_Group[1])*Data_sh$s.area)/(sum((Pred %in% txt_Group[2])*Data_sh$s.area)+sum((Pred %in% txt_Group[1])*Data_sh$s.area))
@@ -189,7 +190,7 @@ AxQnt <- function(imprt_IMG = TRUE, Sub_Back = 30, exp_SIP = TRUE){
 ##################Export the Summary data (csv)##############################
     write.table(Rlt.Summary, paste0(dir_info2$Dir_Name[(nrow(dir_info2)-1)], "_", sdate,"_Summary.csv"),
                 sep=",",row.names=FALSE, quote=F, col.names=TRUE, append=FALSE)
-
+    print(paste0(dir_info2$Dir_Name[(nrow(dir_info2)-1)], "_", sdate,"_Summary.csv"))
 
 ##################change the directory##############################
     if(imprt_IMG == TRUE){

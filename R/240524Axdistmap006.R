@@ -30,52 +30,31 @@ Axdistmap <- function(Sub_Back = 30, Binary = FALSE, All_Features = FALSE, Type 
   #All_Features = "TRUE"
   #Type = "tiff"
   #########################
+  ###############Definition of variable######################
 
   sdate <- Sys.Date()
+  ###############Definition of function######################
   num_f <- function(x){
     x <- as.numeric(levels(x))[x]
   }
+  is.tif <- function(x) regexpr('\\.tif$', x) + regexpr('\\.tiff$', x)> 0
   ######Selecting the Directory#######
-  # 代表的なファイルのファイルパス
   file_path <- choose.files(caption = "Select any file to set the directory",
                             multi=FALSE)
 
-  # ディレクトリ情報の抽出
+
+
+  ######Selecting the Directory#######
   dir_info <- str_replace_all(file_path, pattern = "\\\\", replacement="/") %>%
     str_split( "/") %>%
     unlist() %>%
     as.data.frame()  %>%
     mutate(level = row_number())
   colnames(dir_info) <- c("Dir_Name", "Level")
-  # 最後のファイル名を除いた部分を抽出
   Mainf <- str_c(dir_info$Dir_Name[1:(nrow(dir_info)-1)], collapse = "/")
-  setwd(Mainf)#Low probability of error due to direct selecting a file through dialogue box
-  ######Selecting the Directory#######
-
-
-  #####################
-  # ディレクトリ情報の抽出
-  #file_info <- str_replace_all(file_list.name, pattern = "\\\\", replacement="/") %>%
-  #str_split( "/") %>%
-  #unlist() %>%
-  #as.data.frame()  %>%
-  #mutate(level = row_number())
-  #colnames(file_info) <- c("Dir_Name", "Level")
-  ###################
-
-    is.tif <- function(x) regexpr('\\.tif$', x) + regexpr('\\.tiff$', x)> 0
-
-  ####Information of Date####
-
+  setwd(Mainf)
 
     for (file_list.name in list.files()[is.tif(list.files())]){
-      #####################
-      #test code for debug
-      #sdate <- Sys.Date()
-
-      #num_f <- function(x){
-      #x <- as.numeric(levels(x))[x]
-      #}
 
       test <- readImage(file_list.name)
       test <- resize(test, w = 900)#15Jun11:696 22Apr15:900
@@ -95,18 +74,8 @@ Axdistmap <- function(Sub_Back = 30, Binary = FALSE, All_Features = FALSE, Type 
       rmNum <- which(sdat$s.area <= rma)
       dml <- rmObjects(dml, rmNum)
       sdat <- as.data.frame(computeFeatures.shape(dml)) #option with
-      ####this elimination option is not included in the original program
-      #colorMode(dml) <- Grayscale
-      ######Required ddm for caluculating haralick texture feature.
-      ######However, the numbers of objects are different between them.
-
-
       hdat <- as.data.frame(computeFeatures.haralick(dml,ddm))
       mdat <- as.data.frame(computeFeatures.moment(dml))
-
-      #
-      #
-      #sing_data <- data.frame(cbind("FileName" = file_list.name, sdat, hdat, mdat))
       sing_data <- data.frame(cbind(sdat, hdat, mdat))
       invisible({rm(list=c("sdat", "hdat", "mdat"));gc();gc()})
       data_sht <- na.omit(sing_data)
@@ -132,59 +101,39 @@ Axdistmap <- function(Sub_Back = 30, Binary = FALSE, All_Features = FALSE, Type 
       #####export data file
       write.table(data_sht, paste0(file_list.name,sdate,"_ImageData.txt"),
                   sep="\t",row.names=FALSE, quote=F, col.names=TRUE, append=FALSE)
-      #return(data_sht)
-
-
-      #sdat0 <- as.data.frame(computeFeatures.shape(dml))#When performing this step, an error may occur due to the file size being too large
-      ##sdat <- as.data.frame(computeFeatures.shape(dmrmal))#When performing this step, an error may occur due to the file size being too large
+      print(paste0(file_list.name,sdate,"_ImageData.txt"))
 
       if (Binary == TRUE){
         dmrmabw <- 1*(dml > 0)# %>% # binary image
-        #rotate( angle = -90) %>%
-        #flop()
         if(Type == c("png")){
           file.name <- paste0( file_list.name,sdate, "_Binary.png")
           writeImage(dmrmabw, file.name,type = "png",quality = 100)
+          print(file.name)
         }else if(Type == c("jpg")){
           file.name <- paste0(file_list.name,sdate,  "_Binary.jpg")
           writeImage(dmrmabw, file.name,type = "jpg",quality = 100)
+          print(file.name)
         }else{
           file.name <- paste0( file_list.name,sdate, "_Binary.tiff")
           writeImage(dmrmabw, file.name,type = "tiff",quality = 100)
+          print(file.name)
         }
       }
       ddmrmadm <- ddm*(dml > 0)# %>% # distance map
-      #rotate( angle = -90) %>%
-      #flop()
       if(Type == c("png")){
         file.name <- paste0(file_list.name,sdate,  "_DistMap.png")
         writeImage(ddmrmadm, file.name,type = "png",quality = 100)
+        print(file.name)
       }else if(Type == c("jpg")){
         file.name <- paste0( file_list.name,sdate, "_DistMap.jpg")
         writeImage(ddmrmadm, file.name,type = "jpg",quality = 100)
+        print(file.name)
       }else{
         file.name <- paste0( file_list.name,sdate, "_DistMap.tiff")
         writeImage(ddmrmadm, file.name,type = "tiff",quality = 100)
+        print(file.name)
       }
 
 
-      #dmrmal <- bwlabel(ddmrmadm)
-      #colorMode(dmrmal) <- Grayscale
-
-      #cols = c('black', sample(heat_hcl(max(dmrmal))))
-      #dHeat = Image(cols[1+dmrmal], dim=dim(dmrmal))
-      #file.name <- paste0(sdate, file_list.name, "_Color.png")
-      #writePNG(dHeat,file.name)
-      ##############################
-
-      ##sdat <- as.data.frame(computeFeatures.shape(dmrmal))#When performing this step, an error may occur due to the file size being too large
-
-
-      #if (exists('data_sh') == FALSE) {
-      #} else {
-      #  data_sh <- rbind(data_sh, data.frame(cbind("File" = file_list.name,  "Object size percentage" = sum(data_sht$s.area)/(dim(ddmrmadm)[1]*dim(ddmrmadm)[2])*100)))
-      #}
   }
-      #write.table(data_sh, paste0(sdate,"_Area.txt"),sep="\t",row.names=FALSE, quote=F, col.names=TRUE, append=FALSE)
-      #return(data_sh)
 }
