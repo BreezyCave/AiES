@@ -83,7 +83,6 @@ AxQnt <- function(imprt_IMG = TRUE, Sub_Back = 30, exp_SIP = TRUE){
   }else{
     tryCatch({
       svm_model_loaded = load(file_path1)
-      SVM_model <- c(svm_model_loaded)
     }, error = function(e){
       cat(" Error in load file '",
           dir_info1$Dir_Name[nrow(dir_info1)],"'\n This file dose not have SVM model. \n")
@@ -168,8 +167,7 @@ AxQnt <- function(imprt_IMG = TRUE, Sub_Back = 30, exp_SIP = TRUE){
     for (file_list.name in list.files()[is.txt(list.files())]){
       Data_sh <- read.table(file_list.name, header=T, sep="\t")
       if(! FALSE %in% (Ftr.svm %in% colnames(Data_sh))){
-        svm.pred <- predict(SVM_model, Data_sh, type="class", probability =FALSE)
-        Pred <- SVM_model %>%
+        Pred <- svm_model_loaded %>%
           predict(Data_sh, type="class", probability = FALSE) %>%
           as.character()
         if(exp_SIP == TRUE){
