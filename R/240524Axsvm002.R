@@ -129,12 +129,15 @@ Axsvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
   ######Selecting the Directory1#######
   # file full path
   file_path4 <- choose.files(default = paste0(sdate,"_AxClassifer.svm") ,caption = "Save a SVM model", multi = FALSE)
+  dir_info4 <- dir_info(file_path3)
+  colnames(dir_info4) <- c("Dir_Name", "Level")
 
   if (length(file_path4)==0) {
     cat("Canceled \n")
     return(NULL)##Error countermeasure code
   }else{
     save(SVM_model, file= file_path4)
+    print(dir_info4$Dir_Name[nrow(dir_info4)])
   }
 
   ######Export extracted data file#######

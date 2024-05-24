@@ -165,20 +165,20 @@ AxQnt <- function(imprt_IMG = TRUE, Sub_Back = 30, exp_SIP = TRUE){
 ################Calculate axon integrity index from .txt data#####
 ###############################################import txt data######
     for (file_list.name in list.files()[is.txt(list.files())]){
-      Data_sh <- read.table(file_list.name, header=T, sep="\t")
-      if(! FALSE %in% (Ftr.svm %in% colnames(Data_sh))){
+      Data_shq <- read.table(file_list.name, header=T, sep="\t")
+      if(! FALSE %in% (Ftr.svm %in% colnames(Data_shq))){
         Pred <- svm_model_loaded %>%
           get() %>%
-          predict(Data_sh, type="class", probability = FALSE) %>%
+          predict(Data_shq, type="class", probability = FALSE) %>%
           as.character()
         if(exp_SIP == TRUE){
-          write.table(data.frame(Pred = Pred,Data_sh),
+          write.table(data.frame(Pred = Pred,Data_shq),
                     paste0(file_list.name, "_", sdate,"_SIP.csv"),
                     sep=",",row.names=FALSE, quote=F, col.names=TRUE, append=FALSE)
           print(paste0(file_list.name, "_", sdate,"_SIP.csv"))
         }
-        AxII <- sum((Pred %in% txt_Group[2])*Data_sh$s.area)/(sum((Pred %in% txt_Group[2])*Data_sh$s.area)+sum((Pred %in% txt_Group[1])*Data_sh$s.area))
-        DegI <- sum((Pred %in% txt_Group[1])*Data_sh$s.area)/(sum((Pred %in% txt_Group[2])*Data_sh$s.area)+sum((Pred %in% txt_Group[1])*Data_sh$s.area))
+        AxII <- sum((Pred %in% txt_Group[2])*Data_shq$s.area)/(sum((Pred %in% txt_Group[2])*Data_shq$s.area)+sum((Pred %in% txt_Group[1])*Data_shq$s.area))
+        DegI <- sum((Pred %in% txt_Group[1])*Data_shq$s.area)/(sum((Pred %in% txt_Group[2])*Data_shq$s.area)+sum((Pred %in% txt_Group[1])*Data_shq$s.area))
         Rlt.Summary[nrow(Rlt.Summary)+1,] <- c(file_list.name, AxII, DegI)
       }else{
         cat(file_list.name, ": This file does not contain the required data \n")
