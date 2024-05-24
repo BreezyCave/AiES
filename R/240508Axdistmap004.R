@@ -7,17 +7,17 @@
 #' @importFrom utils write.table
 #' @importFrom utils choose.files
 #' @importFrom stats na.omit
-#' @param Sub_Back TRUE: subtract background objects (under 30 pixels)
+#' @param Sub_Back 30: subtract background objects (default 30 pixels)
 #' @param Binary TRUE: exporting binary image files
 #' @param All_Features TRUE: exporting data of all features
 #' @param Type png, jpg, tiff
 #' @return return the image of distancemap and data of features
 #' @export
 #' @examples
-#' # Axdistmap(Sub_Bacl = TRUE, Binary = FALSE, All_Features = FALSE, Type = tiff)
+#' # Axdistmap(Sub_Bacl = 30, Binary = FALSE, All_Features = FALSE, Type = tiff)
 
 
-Axdistmap <- function(Sub_Back = TRUE, Binary = FALSE, All_Features = FALSE, Type = "tiff"){
+Axdistmap <- function(Sub_Back = 30, Binary = FALSE, All_Features = FALSE, Type = "tiff"){
 
   #### #test code for debug
   #library("EBImage")
@@ -25,7 +25,7 @@ Axdistmap <- function(Sub_Back = TRUE, Binary = FALSE, All_Features = FALSE, Typ
   #library("colorspace")
   #library("EBImage")
   #library("dplyr")
-  #Sub_Back = "FALSE"
+  #Sub_Back <- 30
   #Binary = "TRUE"
   #All_Features = "TRUE"
   #Type = "tiff"
@@ -37,7 +37,8 @@ Axdistmap <- function(Sub_Back = TRUE, Binary = FALSE, All_Features = FALSE, Typ
   }
   ######Selecting the Directory#######
   # 代表的なファイルのファイルパス
-  file_path <- choose.files()
+  file_path <- choose.files(caption = "Select any file to set the directory",
+                            multi=FALSE)
 
   # ディレクトリ情報の抽出
   dir_info <- str_replace_all(file_path, pattern = "\\\\", replacement="/") %>%
@@ -62,7 +63,7 @@ Axdistmap <- function(Sub_Back = TRUE, Binary = FALSE, All_Features = FALSE, Typ
   #colnames(file_info) <- c("Dir_Name", "Level")
   ###################
 
-  is.tif <- function(x) regexpr('\\.tif$', x) + regexpr('\\.tiff$', x)> 0
+    is.tif <- function(x) regexpr('\\.tif$', x) + regexpr('\\.tiff$', x)> 0
 
   ####Information of Date####
 
@@ -90,12 +91,10 @@ Axdistmap <- function(Sub_Back = TRUE, Binary = FALSE, All_Features = FALSE, Typ
       dml <- bwlabel(ddm)
       sdat <- as.data.frame(computeFeatures.shape(dml))
       #######Threshold for eliminating small objects that cannot be classified by image processing
-      if(Sub_Back == TRUE){
-      rma <- 30
+      rma <- Sub_Back
       rmNum <- which(sdat$s.area <= rma)
       dml <- rmObjects(dml, rmNum)
       sdat <- as.data.frame(computeFeatures.shape(dml)) #option with
-      }
       ####this elimination option is not included in the original program
       #colorMode(dml) <- Grayscale
       ######Required ddm for caluculating haralick texture feature.
@@ -125,24 +124,13 @@ Axdistmap <- function(Sub_Back = TRUE, Binary = FALSE, All_Features = FALSE, Typ
                                m.majoraxis = data_sht$m.majoraxis,
                                 stringsAsFactors = TRUE)
       }else {
-        data_sht <<- data.frame(cbind(data_sht,Cir = data_sht$s.area*pi*4/data_sht$s.perimeter^2) , stringsAsFactors = TRUE)
+        data_sht <- data.frame(cbind(data_sht,Cir = data_sht$s.area*pi*4/data_sht$s.perimeter^2) , stringsAsFactors = TRUE)
 
       }
 
-      #if (nrow(sing_data)> NumPic) {
-      #  sing_data <- sing_data[sample(nrow(sing_data), NumPic),]
-      #}
-      #if (exists('data_sh') == FALSE) {
-      #  data_sh <<- sing_data
-      #} else {
-      #  data_sh <<- rbind(data_sh, sing_data)
-      #}
-
-
-
 
       #####export data file
-      write.table(data_sht, paste0(file_list.name,sdate,"_AllFeatures.txt"),
+      write.table(data_sht, paste0(file_list.name,sdate,"_ImageData.txt"),
                   sep="\t",row.names=FALSE, quote=F, col.names=TRUE, append=FALSE)
       #return(data_sht)
 

@@ -4,10 +4,10 @@
 \alias{Axdistmap}
 \title{creating distance map and binary image from tiff image file}
 \usage{
-Axdistmap(Sub_Back = TRUE, Binary = FALSE, All_Features = FALSE, Type = "tiff")
+Axdistmap(Sub_Back = 30, Binary = FALSE, All_Features = FALSE, Type = "tiff")
 }
 \arguments{
-\item{Sub_Back}{TRUE: subtract background objects (under 30 pixels)}
+\item{Sub_Back}{30: subtract background objects (default 30 pixels)}
 
 \item{Binary}{TRUE: exporting binary image files}
 
@@ -22,5 +22,5 @@ return the image of distancemap and data of features
 \code{Axdistmap} create images of distance map and binary image (option) from tiff image files
 }
 \examples{
-# Axdistmap(Sub_Bacl = TRUE, Binary = FALSE, All_Features = FALSE, Type = tiff)
+# Axdistmap(Sub_Bacl = 30, Binary = FALSE, All_Features = FALSE, Type = tiff)
 }

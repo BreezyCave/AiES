@@ -17,4 +17,5 @@ Imports:
     EBImage,
     stringr,
     e1071,
-    ggpubr
+    ggpubr,
+    stats

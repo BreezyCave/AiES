@@ -47,7 +47,7 @@ Axsvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
 
   ######Selecting the Directory1#######
   # file full path
-    file_path1 <- choose.files(caption = "Select file to set the directory (degenerate condition) ",
+    file_path1 <- choose.files(caption = "Select a .txt file to set the directory (degenerate condition) ",
                                multi=FALSE)
 
     if (length(file_path1)==0) {
@@ -63,7 +63,7 @@ Axsvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
 
   ######Selecting the Directory2#######
   # file full path
-  file_path2 <- choose.files(caption = "Select file to set the directory (intact condition) ",
+  file_path2 <- choose.files(caption = "Select a .txt file to set the directory (intact condition) ",
                              multi=FALSE)
 
   if (length(file_path2)==0) {
@@ -139,25 +139,31 @@ Axsvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
       cost = nCst,
       cross = nCrss, #K-fold cross-validation
     )
+  SVM_model
+
+  ##########################export SVM model file
   ######Selecting the Directory1#######
   # file full path
-  file_path3 <- choose.files(default = paste0(sdate,"_AxClassifer.svm") ,caption = "Save a SVM model", multi = FALSE)
+  file_path4 <- choose.files(default = paste0(sdate,"_AxClassifer.svm") ,caption = "Save a SVM model", multi = FALSE)
+
+  if (length(file_path4)==0) {
+    cat("Canceled \n")
+    return(NULL)##Error countermeasure code
+  }else{
+    save(SVM_model, file= file_path4)
+  }
+
+  ######Export extracted data file#######
+  ######Selecting the Directory1#######
+  # file full path
+  file_path3 <- choose.files(default = paste0(sdate,"_Extracted_data_for_ML.txt") ,caption = "Save a extracted data file", multi = FALSE)
 
   if (length(file_path3)==0) {
     cat("Canceled \n")
     return(NULL)##Error countermeasure code
   }else{
-    # extract directory info from the selected file
-    dir_info3 <- dir_info(file_path3)
-    colnames(dir_info3) <- c("Dir_Name", "Level")
-    Mainf[3] <- str_c(dir_info3$Dir_Name[1:(nrow(dir_info3)-1)], collapse = "/")
-    ##########################export data file
-    setwd(Mainf[3])
-    write.table(data_svm, paste0(sdate,"_Extracted_data_for_ML.txt"),
+    write.table(data_svm, file_path3,
                 sep="\t",row.names=FALSE, quote=F, col.names=TRUE, append=FALSE)
-    #return(data_sht)
-    ##########################################
-    save(SVM_model, file= file_path3)
   }
 
 
