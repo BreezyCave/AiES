@@ -33,6 +33,7 @@ Axdistmap <- function(Sub_Back = 30, Binary = FALSE, All_Features = FALSE, Type 
   ###############Definition of variable######################
 
   sdate <- Sys.Date()
+
   ###############Definition of function######################
   num_f <- function(x){
     x <- as.numeric(levels(x))[x]
