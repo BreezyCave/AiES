@@ -60,9 +60,9 @@ Axdistmap <- function(Sub_Back = 30, Binary = FALSE, All_Features = FALSE, Type 
   }
   while(length(file_path)!=0){
     # extract directory info from the selected file
-    dir_info <- dir_info(file_path)
-    colnames(dir_info) <- c("Dir_Name", "Level")
-    setwd(str_c(dir_info$Dir_Name[1:(nrow(dir_info)-1)], collapse = "/"))
+    dir_info1 <- dir_info(file_path)
+    colnames(dir_info1) <- c("Dir_Name", "Level")
+    setwd(str_c(dir_info1$Dir_Name[1:(nrow(dir_info1)-1)], collapse = "/"))
 
 
     for (file_list.name in list.files()[is.tif(list.files())]){
