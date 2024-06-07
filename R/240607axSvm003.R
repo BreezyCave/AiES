@@ -1,5 +1,5 @@
 #' @title creating a classifer based on SVM-based machine learning
-#' @description \code{Axsvm} create a classifer
+#' @description \code{axSvm} create a classifer
 #' @import stringr
 #' @import dplyr
 #' @importFrom e1071 svm
@@ -13,10 +13,10 @@
 #' @return return the svm model and test data
 #' @export
 #' @examples
-#' # Axsvm(Image = TRUE, nCst = 3, nGmm = 0.1, nCrss=5)
+#' # axSvm(Image = TRUE, nCst = 3, nGmm = 0.1, nCrss=5)
 
 
-Axsvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
+axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
 
 ######################Codes for test run
 #  library("dplyr")
@@ -55,8 +55,7 @@ Axsvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
                                multi=FALSE)
 
     if (length(file_path1)==0) {
-      cat("File not selected.\n")
-      return(NULL)##Error countermeasure code
+      return(cat("File not selected.\n"))##Error countermeasure code
     }else{
     # extract directory info from the selected file
     dir_info1 <- dir_info(file_path1)
@@ -71,8 +70,7 @@ Axsvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
                              multi=FALSE)
 
   if (length(file_path2)==0) {
-    cat("File not selected.\n")
-    return(NULL)##Error countermeasure code
+    return(cat("File not selected.\n"))##Error countermeasure code
   }else{
     # extract directory info from the selected file
   dir_info2 <- dir_info(file_path2)
