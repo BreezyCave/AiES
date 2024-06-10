@@ -1,9 +1,10 @@
 Package: AiES
 Type: Package
 Title: Axon Integrity Evaluation System
-Version: 1.0.0
-Author: Shinji TOKUNAGA 
-Maintainer: The package maintainer <s.toku@nemro.jp>
+Version: 0.99.1
+Authors@R: c(
+    person("Shinji", "Tokunaga", email = "tokunaga@ncnp.go.jp", role = c("aut", "cre"))
+    )
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
 License: MIT + file LICENSE
@@ -11,6 +12,7 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
+biocViews: Software, CellBasedAssays, CellBiology, CellCulture, HighThroughputImagingData
 Imports: 
     dplyr,
     colorspace,
