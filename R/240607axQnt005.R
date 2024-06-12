@@ -1,3 +1,5 @@
+# Copyright 2024 Your Company Name
+# BSD 3-Clause License (see LICENSE file)
 #' @title Axon integrity index quantification
 #' @description \code{axQnt} quantificate axonal integrity index (and degeneration index) and export data file
 #' @import stringr

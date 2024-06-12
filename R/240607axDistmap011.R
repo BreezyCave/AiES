@@ -1,3 +1,5 @@
+# Copyright 2024 Your Company Name
+# BSD 3-Clause License (see LICENSE file)
 #' @title creating distance map and binary image from tiff image file
 #' @description \code{axDistmap} create images of distance map and binary image (option) from tiff image files
 #' @import stringr

@@ -1,3 +1,5 @@
+# Copyright 2024 Your Company Name
+# BSD 3-Clause License (see LICENSE file)
 #' @title creating a classifer based on SVM-based machine learning
 #' @description \code{axSvm} create a classifer
 #' @import stringr
