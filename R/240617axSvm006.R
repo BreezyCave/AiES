@@ -159,7 +159,7 @@ axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
         message("Canceled \n")
         return(NULL)##Error countermeasure code
     }else{
-        write.table(data_svm, filePath3,
+        write.table(dataSvm, filePath3,
                     sep="\t",row.names=FALSE, quote=FALSE, col.names=TRUE, append=FALSE)
         message(dirInfo3$Dir_Name[nrow(dirInfo3)])
     }
