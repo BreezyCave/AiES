@@ -42,15 +42,15 @@ axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType
 
   ###############Definition of function######################
   ##Function 1
-  num_f <- function(x){
-    x <- as.numeric(levels(x))[x]
-  }
+  #num_f <- function(x){
+  #  x <- as.numeric(levels(x))[x]
+  #}
   ##Function 2
-  is.tif <- function(x) regexpr('\\.tif$', x) + regexpr('\\.tiff$', x)> 0
+  isTxt <- function(x) regexpr('\\.tif$', x) + regexpr('\\.tiff$', x)> 0
 
   ##Function 3
-  ####function to extract dir_info
-  dir_info <- function(x){
+  ####function to extract dirInfo
+  dirInfo <- function(x){
     str_replace_all(x, pattern = "\\\\", replacement="/") %>%
       str_split( "/") %>%
       unlist() %>%
@@ -61,86 +61,86 @@ axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType
   ##Function 4
   ########Processing Image
   procImage <- function(x){
-    test <- readImage(x)#file_list.name
-    test <- resize(test, w = 900)#15Jun11:696 22Apr15:900
-    test_s <- (1/(1+(0.5/test[,,1])^5))
-    mf1 <- medianFilter(test_s,1)
-    x_mf1 <- (log1p(mf1)/log1p(max(mf1)))
-    x_mf1_log <- (log1p(x_mf1)/log1p(max(x_mf1)))
-    x_thr <- 1 - thresh(x_mf1_log, 8, 8, -0.04)
+    tmpImage <- readImage(x)#file_list.name
+    tmpImage <- resize(tmpImage, w = 900)#15Jun11:696 22Apr15:900
+    contrastST <- (1/(1+(0.5/tmpImage[,,1])^5))
+    medFltr <- medianFilter(contrastST,1)
+    logTrsf <- (log1p(medFltr)/log1p(max(medFltr)))
+    logTrsfLog <- (log1p(logTrsf)/log1p(max(logTrsf)))
+    thrWBInv <- 1 - thresh(logTrsfLog, 8, 8, -0.04)
     kern <- makeBrush(1, shape="box")
-    x_thr_bw <- opening(closing(x_thr, kern), kern)
-    dm <- distmap(x_thr_bw)
-    ddm <- normalize(dm)
-    dml <- bwlabel(ddm)
-    sdat <- as.data.frame(computeFeatures.shape(dml))
+    mrphOprt <- opening(closing(thrWBInv, kern), kern)
+    dm <- distmap(mrphOprt)
+    nDm <- normalize(dm)
+    bnrySeg <- bwlabel(nDm)
+    sdat <- as.data.frame(computeFeatures.shape(bnrySeg))
   #######Threshold for eliminating small objects that cannot be classified by image processing
     rma <- subBack
     rmNum <- which(sdat$s.area <= rma)
-    dml <- rmObjects(dml, rmNum)
-    sdat <- as.data.frame(computeFeatures.shape(dml)) #option with
-    hdat <- as.data.frame(computeFeatures.haralick(dml,ddm))
-    mdat <- as.data.frame(computeFeatures.moment(dml))
-    sing_data <- data.frame(cbind(sdat, hdat, mdat))
+    bnrySeg <- rmObjects(bnrySeg, rmNum)
+    sdat <- as.data.frame(computeFeatures.shape(bnrySeg)) #option with
+    hdat <- as.data.frame(computeFeatures.haralick(bnrySeg,nDm))
+    mdat <- as.data.frame(computeFeatures.moment(bnrySeg))
+    singleData <- data.frame(cbind(sdat, hdat, mdat))
     invisible({rm(list=c("sdat", "hdat", "mdat"));gc();gc()})
-    data_sht <- na.omit(sing_data)
-    if (is.numeric(data_sht[,1]) == FALSE){
-      data_sht <- sapply(data_sht,num_f)
-    }
+    singleData <- na.omit(singleData)
+    #if (is.numeric(singleData[,1]) == FALSE){
+    #  singleData <- sapply(singleData,num_f)
+    #}
 
     if(allFeatures == FALSE){
-      data_sht <- data.frame(s.area = data_sht$s.area,
-                            m.eccentricity = data_sht$m.eccentricity,
-                            s.radius.sd = data_sht$s.radius.sd,
-                            h.sva.s2 = data_sht$h.sva.s2,
-                            h.idm.s1 = data_sht$h.idm.s1,
-                            h.sen.s1 = data_sht$h.sen.s1,
-                            m.majoraxis = data_sht$m.majoraxis,
+      singleData <- data.frame(s.area = singleData$s.area,
+                            m.eccentricity = singleData$m.eccentricity,
+                            s.radius.sd = singleData$s.radius.sd,
+                            h.sva.s2 = singleData$h.sva.s2,
+                            h.idm.s1 = singleData$h.idm.s1,
+                            h.sen.s1 = singleData$h.sen.s1,
+                            m.majoraxis = singleData$m.majoraxis,
                             stringsAsFactors = TRUE)
     }else {
-      data_sht <- data.frame(cbind(data_sht,Cir = data_sht$s.area*pi*4/data_sht$s.perimeter^2) , stringsAsFactors = TRUE)
+      singleData <- data.frame(cbind(singleData,Cir = singleData$s.area*pi*4/singleData$s.perimeter^2) , stringsAsFactors = TRUE)
     }
 
   #####export data file
-    write.table(data_sht, paste0(x,"_",sdate,"_ImageData.txt"),
-                sep="\t",row.names=FALSE, quote=F, col.names=TRUE, append=FALSE)
-    print(paste0(x,sdate,"_ImageData.txt"))
+    write.table(singleData, paste0(x,"_",sdate,"_ImageData.txt"),
+                sep="\t",row.names=FALSE, quote=FALSE, col.names=TRUE, append=FALSE)
+    message(paste0(x,sdate,"_ImageData.txt"))
 
     if (Binary == TRUE){
-      dmrmabw <- 1*(dml > 0)# %>% # binary image
+      dmrmabw <- 1*(bnrySeg > 0)# %>% # binary image
       file.name <- paste0(x,"_",sdate,  "_Binary.", imgType)
       writeImage(dmrmabw, file.name,type = imgType,quality = 100)
-      print(file.name)
+      message(file.name)
 
     }
-    ddmrmadm <- ddm*(dml > 0)# %>% # distance map
+    nDmrmadm <- nDm*(bnrySeg > 0)# %>% # distance map
 
     file.name <- paste0(x,"_",sdate,  "_DistMap.", imgType)
-    writeImage(ddmrmadm, file.name,type = imgType,quality = 100)
-    print(file.name)
+    writeImage(nDmrmadm, file.name,type = imgType,quality = 100)
+    message(file.name)
   }
 
 
 
   ##Function 5
   ######Selecting the Directory#######
-  process_files <- function() {  ##recursive function
-    file_path <- choose.files(caption = "Select any file to set the directory", multi = FALSE)
+  procFiles <- function() {  ##recursive function
+    filePath <- choose.files(caption = "Select any file to set the directory", multi = FALSE)
 
-    if (length(file_path) == 0) return(cat("\nFile not selected.\n"))
+    if (length(filePath) == 0) return(message("\nFile not selected.\n"))
 
     # extract directory info from the selected file
-    dir_info1 <- dir_info(file_path)
-    colnames(dir_info1) <- c("Dir_Name", "Level")
-    setwd(str_c(dir_info1$Dir_Name[1:(nrow(dir_info1) - 1)], collapse = "/"))
+    dirInfo1 <- dirInfo(filePath)
+    colnames(dirInfo1) <- c("Dir_Name", "Level")
+    setwd(str_c(dirInfo1$Dir_Name[seq_len(nrow(dirInfo1) - 1)], collapse = "/"))
 
-    lapply(list.files()[is.tif(list.files())], procImage)
+    lapply(list.files()[isTxt(list.files())], procImage)
 
-    process_files()
+    procFiles()
   }
 
   ##Excecute
-  process_files()
+  procFiles()
 
 }
 
