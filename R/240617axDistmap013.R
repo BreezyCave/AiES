@@ -103,7 +103,7 @@ axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType
         #####export data file
         write.table(singleData, paste0(x,"_",sdate,"_ImageData.txt"),
                     sep="\t",row.names=FALSE, quote=FALSE, col.names=TRUE, append=FALSE)
-        message(paste0(x,sdate,"_ImageData.txt"))
+        message(sprintf("%s_%s_ImageData.txt",x,sdate))
 
         if (Binary == TRUE){
             dmrmabw <- 1*(bnrySeg > 0)# %>% # binary image

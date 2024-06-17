@@ -114,7 +114,7 @@ axQnt <- function(imprtImg = TRUE, subBack = 30, expSip = TRUE){
         #####export data file
         write.table(singleData, paste0(x,sdate,"_ImageData.txt"),
                     sep="\t",row.names=FALSE, quote=FALSE, col.names=TRUE, append=FALSE)
-        message(paste0(x,"_",sdate,"_ImageData.txt"))
+        message(sprintf("%s_%s_ImageData.txt",x,sdate))
     }
 
     ##Function 7
@@ -130,7 +130,7 @@ axQnt <- function(imprtImg = TRUE, subBack = 30, expSip = TRUE){
                 write.table(data.frame(Pred = Pred,Data_shq),
                             paste0(x, "_", sdate,"_SIP.csv"),
                             sep=",",row.names=FALSE, quote=FALSE, col.names=TRUE, append=FALSE)
-                message(paste0(x, "_", sdate,"_SIP.csv"))
+                message(sprintf( "%s_%s_SIP.csv", x,sdate))
             }
             AxII <- sum((Pred %in% txtGroup[2])*Data_shq$s.area)/(sum((Pred %in% txtGroup[2])*Data_shq$s.area)+sum((Pred %in% txtGroup[1])*Data_shq$s.area))
             DegI <- sum((Pred %in% txtGroup[1])*Data_shq$s.area)/(sum((Pred %in% txtGroup[2])*Data_shq$s.area)+sum((Pred %in% txtGroup[1])*Data_shq$s.area))
@@ -172,7 +172,7 @@ axQnt <- function(imprtImg = TRUE, subBack = 30, expSip = TRUE){
         ##################Export the Summary data (csv)##############################
         write.table(rltSummary, paste0(dirInfo2$Dir_Name[(nrow(dirInfo2)-1)], "_", sdate,"_Summary.csv"),
                     sep=",",row.names=FALSE, quote=FALSE, col.names=TRUE, append=FALSE)
-        message(paste0(dirInfo2$Dir_Name[(nrow(dirInfo2)-1)], "_", sdate,"_Summary.csv"))
+        message(sprintf("%s_%s_Summary.csv", dirInfo2$Dir_Name[(nrow(dirInfo2)-1)],sdate))
 
 
         procFiles()##recursive function
