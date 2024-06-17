@@ -103,13 +103,13 @@ axQnt <- function(imprtImg = TRUE, subBack = 30, expSip = TRUE){
         #}
 
         singleData <- data.frame(s.area = singleData$s.area,
-                                 m.eccentricity = singleData$m.eccentricity,
-                                 s.radius.sd = singleData$s.radius.sd,
-                                 h.sva.s2 = singleData$h.sva.s2,
-                                 h.idm.s1 = singleData$h.idm.s1,
-                                 h.sen.s1 = singleData$h.sen.s1,
-                                 m.majoraxis = singleData$m.majoraxis,
-                                 stringsAsFactors = TRUE)
+            m.eccentricity = singleData$m.eccentricity,
+            s.radius.sd = singleData$s.radius.sd,
+            h.sva.s2 = singleData$h.sva.s2,
+            h.idm.s1 = singleData$h.idm.s1,
+            h.sen.s1 = singleData$h.sen.s1,
+            m.majoraxis = singleData$m.majoraxis,
+            stringsAsFactors = TRUE)
 
         #####export data file
         write.table(singleData, paste0(x,sdate,"_ImageData.txt"),
@@ -146,11 +146,11 @@ axQnt <- function(imprtImg = TRUE, subBack = 30, expSip = TRUE){
     procFiles <- function() {  ##recursive function
         # file full path
         ifelse(imprtImg == TRUE,
-               filePath2 <- choose.files(caption = "Select any tiff file to set the directory",
+            filePath2 <- choose.files(caption = "Select any tiff file to set the directory",
                                          multi=FALSE),
-               filePath2 <- choose.files(caption = "Select any text file to set the directory",
+            filePath2 <- choose.files(caption = "Select any text file to set the directory",
                                          multi=FALSE))
-        if(length(filePath2)==0) return(message("File not selected.\n"))
+        if(length(filePath2)==0) return(("File not selected.\n"))
 
         # extract directory info from the selected file
         dirInfo2 <- dirInfo(filePath2)
@@ -184,7 +184,7 @@ axQnt <- function(imprtImg = TRUE, subBack = 30, expSip = TRUE){
     ######Selecting the Directory1#######
     # file full path
     filePath1 <- choose.files(caption = "Select a SVM model",
-                              multi=FALSE)
+        multi=FALSE)
     if (length(filePath1)==0) {
         return(message("File not selected.\n"))##Error countermeasure code
     }else{
@@ -194,7 +194,7 @@ axQnt <- function(imprtImg = TRUE, subBack = 30, expSip = TRUE){
             svmModelLoaded <- load(filePath1)
         }, error = function(e){
             stop(" Error in load file '",
-                 dirInfo1$Dir_Name[nrow(dirInfo1)],"'\n This file dose not have SVM model. \n")
+                dirInfo1$Dir_Name[nrow(dirInfo1)],"'\n This file dose not have SVM model. \n")
         })
     }
 

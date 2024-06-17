@@ -89,13 +89,13 @@ axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType
 
         if(allFeatures == FALSE){
             singleData <- data.frame(s.area = singleData$s.area,
-                                     m.eccentricity = singleData$m.eccentricity,
-                                     s.radius.sd = singleData$s.radius.sd,
-                                     h.sva.s2 = singleData$h.sva.s2,
-                                     h.idm.s1 = singleData$h.idm.s1,
-                                     h.sen.s1 = singleData$h.sen.s1,
-                                     m.majoraxis = singleData$m.majoraxis,
-                                     stringsAsFactors = TRUE)
+                m.eccentricity = singleData$m.eccentricity,
+                    s.radius.sd = singleData$s.radius.sd,
+                    h.sva.s2 = singleData$h.sva.s2,
+                    h.idm.s1 = singleData$h.idm.s1,
+                    h.sen.s1 = singleData$h.sen.s1,
+                    m.majoraxis = singleData$m.majoraxis,
+                    stringsAsFactors = TRUE)
         }else {
             singleData <- data.frame(cbind(singleData,Cir = singleData$s.area*pi*4/singleData$s.perimeter^2) , stringsAsFactors = TRUE)
         }

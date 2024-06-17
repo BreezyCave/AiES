@@ -63,7 +63,7 @@ axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
     ######Selecting the Directory1#######
     # file full path
     filePath1 <- choose.files(caption = "Select a .txt file to set the directory (degenerate condition) ",
-                              multi=FALSE)
+        multi=FALSE)
 
     if (length(filePath1)==0) {
         return(message("File not selected.\n"))##Error countermeasure code
@@ -78,7 +78,7 @@ axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
     ######Selecting the Directory2#######
     # file full path
     filePath2 <- choose.files(caption = "Select a .txt file to set the directory (intact condition) ",
-                              multi=FALSE)
+        multi=FALSE)
 
     if (length(filePath2)==0) {
         return(message("File not selected.\n"))##Error countermeasure code
@@ -107,10 +107,10 @@ axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
 
         if (exists('trainingData') == FALSE) {
             trainingData <- data.frame(cbind("Group" = as.factor(txtGroup[y]), TempData),
-                                       stringsAsFactors = TRUE)
+                stringsAsFactors = TRUE)
         } else {
             trainingData <- rbind(trainingData, data.frame(cbind("Group" = as.factor(txtGroup[y]), TempData),
-                                                           stringsAsFactors = TRUE))
+                stringsAsFactors = TRUE))
         }
         return(trainingData)
     }
