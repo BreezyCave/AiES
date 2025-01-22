@@ -1,26 +1,37 @@
+# Axon Integrity Index Calculation Package
 
-# AiES
-
-<!-- badges: start -->
-<!-- badges: end -->
-
-The goal of AiES is to ...
+This package provides a set of functions for calculating the Axon Integrity Index and Degeneration Index from axon images.
 
 ## Installation
 
-You can install the development version of AiES from [GitHub](https://github.com/) with:
-
-``` r
-# install.packages("devtools")
-devtools::install_github("BreezyCave/AiES")
+```r
+devtools::install_github("YourGitHubUsername/YourPackageName")
 ```
 
-## Example
+## Usage
 
-This is a basic example which shows you how to solve a common problem:
+This package includes three main functions:
 
-``` r
-library(AiES)
-## basic example code
-```
+1. `axDistmap()`: Extracts features from TIFF image files.
+2. `axSvm()`: Creates an SVM model using the extracted features.
+3. `axQnt()`: Calculates the Axon Integrity Index and Degeneration Index using the created SVM model.
 
+For detailed usage instructions, please refer to the vignettes included in the package.
+
+## Requirements
+
+- R version 4.0.0 or higher
+- The following R packages:
+  - stringr
+  - dplyr
+  - EBImage
+  - e1071
+  - ggpubr
+
+## License
+
+This project is licensed under the BSD 3-Clause License. See the LICENSE file for details.
+
+## Contact
+
+For bug reports or feature requests, please use the Issues page on GitHub.

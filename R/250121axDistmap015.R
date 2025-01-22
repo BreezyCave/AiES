@@ -1,23 +1,84 @@
-# Copyright 2024 Your Company Name
+# Copyright 2025 Your Company Name
 # BSD 3-Clause License (see LICENSE file)
-#' @title creating distance map and binary image from tiff image file
-#' @description \code{axDistmap} create images of distance map and binary image (option) from tiff image files
-#' @import stringr
-#' @import colorspace
-#' @import dplyr
-#' @importFrom EBImage readImage resize medianFilter thresh makeBrush opening closing distmap bwlabel rmObjects normalize computeFeatures.shape computeFeatures.haralick computeFeatures.moment writeImage
-#' @importFrom utils write.table
-#' @importFrom ggpubr mutate
-#' @importFrom utils choose.files
-#' @importFrom stats na.omit
-#' @param subBack 30: subtract background objects (default 30 pixels)
-#' @param Binary TRUE: exporting binary image files
-#' @param allFeatures TRUE: exporting data of all features
-#' @param imgType png, jpg, tiff
-#' @return return the image of distancemap and data of features
-#' @export
+#' @title Create distance map and binary image from TIFF image file
+#' @description
+#' `axDistmap` processes TIFF image files to create distance maps and optionally binary images.
+#' It also computes various image features and exports them as a text file.
+#'
+#' @param subBack Numeric. Size of background objects to subtract (default: 30 pixels).
+#' @param Binary Logical. If TRUE, exports binary image files (default: FALSE).
+#' @param allFeatures Logical. If TRUE, exports data of all computed features (default: FALSE).
+#' @param imgType Character. Output image format: "png", "jpg", or "tiff" (default: "png").
+#'
+#'
+#' @return This function doesn't return a value directly, but produces the following outputs:
+#' \itemize{
+#'   \item A distance map image file (format specified by `imgType`)
+#'   \item A text file containing computed image features (named "'original_filename'_'current_date'_ImageData.txt")
+#'   \item (Optional) A binary image file if `Binary = TRUE` (format specified by `imgType`)
+#' }
+#'
+#' @details
+#' The function performs the following steps:
+#' 1. Reads and resizes the input TIFF image
+#' 2. Applies various image processing techniques (contrast adjustment, filtering, thresholding)
+#' 3. Computes a distance map
+#' 4. Computes shape, Haralick, and moment features
+#' 5. Exports the processed images as image files
+#' 6. Exports the computed features as a tab-separated text file
+#'
+#' @section Feature Export:
+#' The function always exports computed features as a text file.
+#' If allFeatures = FALSE, it exports a subset of features including:
+#' - s.area (EBImage::computeFeatures.shape)
+#' - m.eccentricity (EBImage::computeFeatures.moment)
+#' - s.radius.sd (EBImage::computeFeatures.shape)
+#' - h.sva.s2 (EBImage::computeFeatures.haralick)
+#' - h.idm.s1 (EBImage::computeFeatures.haralick)
+#' - h.sen.s1 (EBImage::computeFeatures.haralick)
+#' - m.majoraxis (EBImage::computeFeatures.moment)
+#'
+#' If allFeatures = TRUE, it exports all computed features from EBImage's computeFeatures
+#' functions (shape, moment, and haralick) plus an additional 'Cir' feature.
+#' The 'Cir' feature represents Circularity and is calculated as:
+#' Cir = (s.area * pi * 4) / (s.perimeter^2), where s.area and s.perimeter are from
+#' EBImage::computeFeatures.shape.
+#'
+#' @note
+#' - The function will prompt the user to select a directory containing TIFF files.
+#' - It processes all TIFF files in the selected directory.
+#' - Once there are no unprocessed files left in the selected directory, the function will prompt
+#'   the user to choose whether to process another folder.
+#' - Processing will continue until the user cancels the operation.
+#' - Output files (images and feature data) are saved in the same directory as the input files.
+#' - The feature data text file is named using the format: "'original_filename'_'current_date'_ImageData.txt"
+#' - If allFeatures = FALSE, only features required for the support vector machine learning in this package are exported.
+#' - If allFeatures = TRUE, all features from EBImage package plus Circularity are exported.
+#'
 #' @examples
-#' # axDistmap(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType = png)
+#' \dontrun{
+#' # Basic usage with default parameters
+#' # Exports only features needed for SVM learning
+#' axDistmap()
+#'
+#' # Create binary images and export all EBImage features plus Circularity as PNG
+#' axDistmap(subBack = 50, Binary = TRUE, allFeatures = TRUE, imgType = "png")
+#'
+#' # Process images and export as TIFF without binary images
+#' # Only exports features needed for SVM learning
+#' axDistmap(subBack = 20, Binary = FALSE, allFeatures = FALSE, imgType = "tiff")
+#'
+#' # Export all EBImage features plus Circularity without creating binary images
+#' axDistmap(Binary = FALSE, allFeatures = TRUE)
+#' }
+#'
+#' @import stringr colorspace dplyr
+#' @importFrom EBImage readImage resize medianFilter thresh makeBrush opening closing distmap bwlabel rmObjects normalize computeFeatures.shape computeFeatures.haralick computeFeatures.moment writeImage
+#' @importFrom utils write.table choose.files
+#' @importFrom ggpubr mutate
+#' @importFrom stats na.omit
+#'
+#' @export
 
 
 axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType = "png"){
