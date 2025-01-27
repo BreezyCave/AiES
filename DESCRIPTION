@@ -21,8 +21,12 @@ Imports:
     stringr,
     e1071,
     ggpubr,
-    stats
+    stats,
+    fs
 Suggests: 
     knitr,
-    BiocStyle
+    BiocStyle,
+    tcltk,
+    rstudioapi,
+    svDialogs
 VignetteBuilder: knitr
