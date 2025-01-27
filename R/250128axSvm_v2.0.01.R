@@ -70,6 +70,7 @@ axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
     txtGroup <- c("Degenerate","Intact")
     ftrTmp <- c("Group","m.eccentricity","s.radius.sd","h.sva.s2","h.idm.s1","h.sen.s1","m.majoraxis")
     sdate <- Sys.Date()
+    mainFldr <- if(exists("mainFldr")) mainFldr else c(NA_character_, NA_character_)
 
     ###############Definition of function######################
     ##Function 1
