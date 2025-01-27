@@ -1,54 +1,21 @@
-# Copyright 2025 Your Company Name
+# Copyright 2024 Your Company Name
 # BSD 3-Clause License (see LICENSE file)
-#' @title Create a classifier based on SVM machine learning
-#' @description
-#' `axSvm` creates a Support Vector Machine (SVM) classifier for binary classification
-#' of image features, typically used to distinguish between "Degenerate" and "Intact" conditions.
-#'
-#' @param nCst Numeric. Cost parameter for libsvm (default: 3).
-#' @param nGmm Numeric. Gamma parameter for libsvm (default: 0.1).
-#' @param nCrss Integer. Number of folds for K-fold cross-validation (default: 5).
-#'
-#' @return This function doesn't return values directly, but produces the following outputs:
-#' \itemize{
-#'   \item A text file containing the extracted data used for machine learning.
-#'   \item An .svm file containing the trained SVM model.
-#' }
-#'
-#' @details
-#' The function performs the following steps:
-#' 1. Prompts the user to select directories containing feature data for "Degenerate" and "Intact" conditions.
-#' 2. Reads and combines the feature data from both conditions.
-#' 3. Trains an SVM model using the specified parameters.
-#' 4. Exports the extracted data for machine learning and the trained SVM model to user-specified locations.
-#'
-#' @section Feature Selection:
-#' The function uses the following features for SVM training:
-#' "Group", "m.eccentricity", "s.radius.sd", "h.sva.s2", "h.idm.s1", "h.sen.s1", "m.majoraxis"
-#'
-#' @note
-#' - The function will prompt the user to select directories containing .txt files with feature data.
-#' - It processes all .txt files in the selected directories.
-#' - The user will be prompted to specify save locations for the extracted data and SVM model.
-#' - The extracted data file is saved with the name format: "'current_date'_Extracted_data_for_ML.txt"
-#' - The SVM model file is saved with the name format: "'current_date'_AxClassifer.svm"
-#'
-#' @examples
-#' \dontrun{
-#' # Basic usage with default parameters
-#' axSvm()
-#'
-#' # Custom SVM parameters
-#' axSvm(nCst = 5, nGmm = 0.05, nCrss = 10)
-#' }
-#'
-#' @import stringr dplyr
+#' @title creating a classifer based on SVM-based machine learning
+#' @description \code{axSvm} create a classifer
+#' @import stringr
+#' @import dplyr
 #' @importFrom e1071 svm
 #' @importFrom ggpubr mutate
-#' @importFrom utils write.table choose.files read.table
+#' @importFrom utils write.table
+#' @importFrom utils choose.files
+#' @importFrom utils read.table
+#' @param nCst 3: cost parameter for libsvm
+#' @param nGmm 0.1: gamma parameter for libsvm
+#' @param nCrss 5: number of K-fold cross-validation
+#' @return return the svm model and test data
 #' @export
-
-
+#' @examples
+#' # axSvm(Image = TRUE, nCst = 3, nGmm = 0.1, nCrss=5)
 
 
 axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5){
