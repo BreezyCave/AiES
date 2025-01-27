@@ -1,23 +1,60 @@
-# Copyright 2024 Your Company Name
+# Copyright 2025 Your Company Name
 # BSD 3-Clause License (see LICENSE file)
 #' @title Axon integrity index quantification
-#' @description \code{axQnt} quantificate axonal integrity index (and degeneration index) and export data file
-#' @import stringr
-#' @import dplyr
+#' @description
+#' `axQnt` quantifies the axonal integrity index (Axon Integrity Index, AII) and degeneration index (Degeneration Index, DI)
+#' from either image files (.tiff) or precomputed data files (.txt). The function uses a pre-trained SVM model to classify
+#' axonal regions and calculates the indices based on the classified areas. It also exports processed data and summary files.
+#'
+#'
+#' @import stringr dplyr
 #' @importFrom EBImage readImage resize medianFilter thresh makeBrush opening closing distmap bwlabel rmObjects normalize computeFeatures.shape computeFeatures.haralick computeFeatures.moment
-#' @importFrom stats predict
+#' @importFrom stats predict na.omit
 #' @importFrom ggpubr mutate
-#' @importFrom utils write.table
-#' @importFrom utils choose.files
-#' @importFrom utils read.table
-#' @importFrom stats na.omit
-#' @param imprtImg TRUE: import image file (.tiff) or data file (.txt)
-#' @param subBack 30: subtract background objects (default 30 pixels)
-#' @param expSip TRUE: export single image prediction data file (.csv)
-#' @return return the Summary csv data and Image data (option)
-#' @export
+#' @importFrom utils write.table choose.files read.table
+#'
+#' @param imprtImg Logical. If TRUE, imports image files (.tiff) for processing. If FALSE, imports precomputed data files (.txt) (default: TRUE).
+#' @param subBack Numeric. Threshold for subtracting background objects based on size (default: 30 pixels).
+#' @param expSip Logical. If TRUE, exports single image prediction results as .csv files (default: TRUE).
+#'
+#' @return The function does not return values directly but generates the following outputs:
+#' \itemize{
+#'   \item A summary .csv file containing the calculated Axon Integrity Index (AII) and Degeneration Index (DI) for each file.
+#'   \item (Optional) Single image prediction results as .csv files if `expSip = TRUE`.
+#'   \item (Optional) Processed image data as .txt files if `imprtImg = TRUE`.
+#' }
+#'
+#' @details
+#' The function processes input data as follows:
+#' 1. Prompts the user to select a pre-trained SVM model file.
+#' 2. Depending on `imprtImg`, it either processes image files (.tiff) to extract features or directly uses precomputed feature data (.txt).
+#' 3. Uses the loaded SVM model to classify axonal regions into "Degenerate" or "Intact".
+#' 4. Calculates Axon Integrity Index (AII) and Degeneration Index (DI) based on classified areas:
+#'    \[
+#' \deqn{AII = \frac{\text{Area of Intact Axons}}{\text{Total Axonal Area}}}
+#' \deqn{DI = \frac{\text{Area of Degenerate Axons}}{\text{Total Axonal Area}}}
+#'    \]
+#' 5. Exports results as summary and optional detailed prediction files.
+#'
+#' @note
+#' - The function uses a recursive process to allow continuous processing of multiple directories until the user cancels.
+#' - Processed image data is exported only if `imprtImg = TRUE`.
+#' - Single image prediction results are exported only if `expSip = TRUE`.
+#'
 #' @examples
-#' # axQnt(imprtImg = TRUE, subBack = 30, expSip = TRUE)
+#' \dontrun{
+#' # Process .tiff images to calculate Axon Integrity Index and export single image predictions
+#' axQnt(imprtImg = TRUE, subBack = 30, expSip = TRUE)
+#'
+#' # Use precomputed feature data from .txt files without exporting single image predictions
+#' axQnt(imprtImg = FALSE, subBack = 20, expSip = FALSE)
+#'
+#' # Adjust background subtraction threshold and process images
+#' axQnt(imprtImg = TRUE, subBack = 50)
+#' }
+#'
+#' @export
+#'
 
 
 axQnt <- function(imprtImg = TRUE, subBack = 30, expSip = TRUE){
@@ -147,9 +184,9 @@ axQnt <- function(imprtImg = TRUE, subBack = 30, expSip = TRUE){
         # file full path
         ifelse(imprtImg == TRUE,
             filePath2 <- choose.files(caption = "Select any tiff file to set the directory",
-                multi=FALSE),
+                                         multi=FALSE),
             filePath2 <- choose.files(caption = "Select any text file to set the directory",
-                multi=FALSE))
+                                         multi=FALSE))
         if(length(filePath2)==0) return(("File not selected.\n"))
 
         # extract directory info from the selected file
@@ -193,8 +230,8 @@ axQnt <- function(imprtImg = TRUE, subBack = 30, expSip = TRUE){
             colnames(dirInfo1) <- c("Dir_Name", "Level")
             svmModelLoaded <- load(filePath1)
         }, error = function(e){
-            message(sprintf(" Error in load file '%s'\n This file dose not have SVM model. \n",
-                            dirInfo1$Dir_Name[nrow(dirInfo1)]))
+            stop(" Error in load file '",
+                dirInfo1$Dir_Name[nrow(dirInfo1)],"'\n This file dose not have SVM model. \n") ##* NOTE:  Avoid redundant 'stop' and 'warn*' in signal conditions
         })
     }
 
