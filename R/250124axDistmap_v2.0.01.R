@@ -73,7 +73,7 @@
 #' }
 #'
 #' @import stringr colorspace dplyr
-#' @importFrom EBImage readImage resize medianFilter thresh makeBrush opening closing distmap bwlabel rmObjects normalize computeFeatures.shape computeFeatures.haralick computeFeatures.moment writeImage
+#' @importFrom EBImage readImage resize medianFilter thresh makeBrush opening closing distmap bwlabel rmObjects normalize computeFeatures.shape computeFeatures.haralick computeFeatures.moment writeImage channel
 #' @importFrom utils write.table choose.files
 #' @importFrom ggpubr mutate
 #' @importFrom stats na.omit
