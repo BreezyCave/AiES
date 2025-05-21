@@ -82,7 +82,7 @@
 #' @export
 
 
-axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType = "tiff", folder_paths = "NULL"){
+axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType = "tiff", folder_paths = NULL){
 
     ###imgType check
     if(!(imgType %in% c("tiff","png","jpg"))) imgType <- "tiff"
