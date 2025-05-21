@@ -3,16 +3,14 @@ Type: Package
 Title: Axon Integrity Evaluation System
 Version: 0.99.1
 Authors@R: c(
-person("Shinji", "Tokunaga", email = "tokunaga@ncnp.go.jp", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8398-3054")),
-person("Masafumi", "Funakoshi", email = "funakoshi@ncnp.go.jp", role = "ctb"),
-person("Shinji", "Tokunaga", email = "taraki@ncnp.go.jp", role = "ctb", comment = c(ORCID = "0000-0003-3625-2042"))
-)
+  person("Shinji", "Tokunaga", email = "tokunaga@ncnp.go.jp", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8398-3054")),
+  person("Masafumi", "Funakoshi", email = "funakoshi@ncnp.go.jp", role = "ctb"),
+  person("Shinji", "Tokunaga", email = "taraki@ncnp.go.jp", role = "ctb", comment = c(ORCID = "0000-0003-3625-2042"))
+  )
 Maintainer: Shinji Tokunaga <tokunaga@ncnp.go.jp>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-    Let's get fun to quantify axon integrity index.
-License: BSD 3-clause License + file LICENSE
-Copyright: 2024 National Center of Neurology and Psychiatry
+Description: Let's get fun to quantify axon integrity index.
+License: BSD_3_clause + file LICENSE
+Copyright: 2025 National Center of Neurology and Psychiatry
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2

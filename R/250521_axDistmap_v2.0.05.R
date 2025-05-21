@@ -98,8 +98,8 @@ axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType
     ##allFeatures = "TRUE"
     ##imgType = "tiff"
     ##folder_paths <- NULL
-    ##folder_paths = c("D:/NCNP/01 R&D Eng/01 Projects/04 R package/02 R&D/RStudio/AiES/inst,
-    ##                 "D:/NCNP/01 R&D Eng/01 Projects/04 R package/02 R&D/RStudio/AiES/inst/")
+    ##folder_paths = c("D:/NCNP/01 R&D Eng/01 Projects/04 R package/02 R&D/RStudio/AiES/inst/extdata/Degenerate_Images,
+    ##                 "D:/NCNP/01 R&D Eng/01 Projects/04 R package/02 R&D/RStudio/AiES/inst/extdata/Intact_Images")
     #########################
     ###############Definition of variable######################
 
@@ -147,16 +147,20 @@ axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType
             message("No folders selected. Exiting function.")
             return(NULL)
         }
-    } else {
-        folder_paths <- as.list(folder_paths)
     }
 
+    folder_paths <- as.list(folder_paths)
 
-    # 有効なフォルダが一つもなかった場合
-    if (length(valid_folder_paths) == 0) {
+
+    # 有効な（実際に存在する）フォルダだけを残す
+    folder_paths <- Filter(dir.exists, folder_paths)
+    folder_paths <- unique(folder_paths) # 重複除去（必要なら）
+
+    if (length(folder_paths) == 0) {
         message("No valid folders to process. Exiting function.")
         return(NULL)
     }
+
 
     # 各フォルダを処理
     results <- lapply(folder_paths, function(folder_path) {
@@ -166,6 +170,7 @@ axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType
         }
 
         # TIFFファイル(.tiff or .tif)の取得
+        # サブフォルダを調べるかどうか recurse = TRUE/FALSE
         tiff_files <- fs::dir_ls(folder_path, regexp = "\\.tiff?$", recurse = TRUE)
 
         if (length(tiff_files) == 0) {
