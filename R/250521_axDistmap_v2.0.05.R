@@ -123,6 +123,7 @@ axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType
     # フォルダの選択または指定
     if (is.null(folder_paths)) {
         folder_paths <- character(0) # 初期化
+        continue_selection <- "y"
         repeat {
             selected_folder <- select_folder()
             if (is.null(selected_folder)) {
@@ -138,7 +139,7 @@ axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType
             }
             # フォルダ選択を続けるか確認
             continue_selection <- readline(prompt = "Select another folder? (y/n): ")
-            if (tolower(continue_selection) != "y") {#大文字を小文字に変換
+            if (tolower(continue_selection) != "y") {  #大文字を小文字に変換
                 break # ループを抜ける
             }
         }
@@ -182,6 +183,10 @@ axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType
         process_file <- function(file) {
             message(sprintf("Processing file: %s", file))
 
+            # 出力先フォルダ名の作成
+            output_dir <- file.path(dirname(file),
+                                    paste0(basename(folder_path), "_", sdate, "_output_files"))
+            if (!dir.exists(output_dir)) dir.create(output_dir)
 
             tmpImage <- readImage(file)#file_list.name
 
@@ -237,21 +242,23 @@ axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType
             }
 
             #####export data file
-            write.table(singleData, paste0(file,"_",sdate,"_ImageData.txt"),
-                        sep="\t",row.names=FALSE, quote=FALSE, col.names=TRUE, append=FALSE)
-            message(sprintf("%s_%s_ImageData.txt",file,sdate))
+            write.table(singleData,
+                        file.path(output_dir, paste0(basename(file), "_", sdate, "_ImageData.txt")),
+                        sep="\t", row.names=FALSE, quote=FALSE, col.names=TRUE, append=FALSE)
+            message(sprintf("%s_%s_ImageData.txt", basename(file), sdate))
 
-            if (Binary == TRUE){
-                dmrmabw <- 1*(bnrySeg > 0)# %>% # binary image
-                file.name <- paste0(file,"_",sdate,  "_Binary.", imgType)
-                writeImage(dmrmabw, file.name,type = imgType,quality = 100)
+            if (Binary == TRUE) {
+                dmrmabw <- 1*(bnrySeg > 0)
+                file.name <- file.path(output_dir, paste0(basename(file), "_", sdate, "_Binary.", imgType))
+                writeImage(dmrmabw, file.name, type = imgType, quality = 100)
                 message(file.name)
-
             }
+
+
             nDmrmadm <- nDm*(bnrySeg > 0)# %>% # distance map
 
-            file.name <- paste0(file,"_",sdate,  "_DistMap.", imgType)
-            writeImage(nDmrmadm, file.name,type = imgType,quality = 100)
+            file.name <- file.path(output_dir, paste0(basename(file), "_", sdate, "_DistMap.", imgType))
+            writeImage(nDmrmadm, file.name, type = imgType, quality = 100)
             message(file.name)
         }
 
