@@ -1,4 +1,4 @@
-# Copyright 2025 Your Company Name
+# Copyright 2025 NCNP
 # BSD 3-Clause License (see LICENSE file)
 #' @title Create distance map and binary image from TIFF image file
 #' @description
@@ -82,7 +82,7 @@
 #' @export
 
 
-axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType = "tiff", folder_paths = NULL){
+axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType = "tiff", folder_paths = "NULL"){
 
     ###imgType check
     if(!(imgType %in% c("tiff","png","jpg"))) imgType <- "tiff"
@@ -97,6 +97,7 @@ axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType
     ##Binary = "TRUE"
     ##allFeatures = "TRUE"
     ##imgType = "tiff"
+    ##folder_paths <- NULL
     ##folder_paths = c("D:/NCNP/01 R&D Eng/01 Projects/04 R package/02 R&D/RStudio/AiES/inst,
     ##                 "D:/NCNP/01 R&D Eng/01 Projects/04 R package/02 R&D/RStudio/AiES/inst/")
     #########################
@@ -121,15 +122,41 @@ axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType
 
     # フォルダの選択または指定
     if (is.null(folder_paths)) {
-        folder_paths <- select_folder()
-        if (is.null(folder_paths)) {
-            message("No folder selected. Exiting function.")
+        folder_paths <- character(0) # 初期化
+        repeat {
+            selected_folder <- select_folder()
+            if (is.null(selected_folder)) {
+                message("Folder selection cancelled.")
+                break # ループを抜ける
+            }
+            # 選択されたフォルダが既にリストにないか確認
+            if (!(selected_folder %in% folder_paths)) {
+                folder_paths <- c(folder_paths, selected_folder)
+                message(sprintf("Added folder: %s", selected_folder))
+            } else {
+                message(sprintf("Folder already selected: %s. Skipping.", selected_folder))
+            }
+            # フォルダ選択を続けるか確認
+            continue_selection <- readline(prompt = "Select another folder? (y/n): ")
+            if (tolower(continue_selection) != "y") {#大文字を小文字に変換
+                break # ループを抜ける
+            }
+        }
+        # フォルダが一つも選択されなかった場合
+        if (length(folder_paths) == 0) {
+            message("No folders selected. Exiting function.")
             return(NULL)
         }
     } else {
         folder_paths <- as.list(folder_paths)
     }
 
+
+    # 有効なフォルダが一つもなかった場合
+    if (length(valid_folder_paths) == 0) {
+        message("No valid folders to process. Exiting function.")
+        return(NULL)
+    }
 
     # 各フォルダを処理
     results <- lapply(folder_paths, function(folder_path) {
