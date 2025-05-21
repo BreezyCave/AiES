@@ -1,4 +1,4 @@
-# Copyright 2025 NCNP
+# Copyright 2025 National Center of Neurology and Psychiatry
 # BSD 3-Clause License (see LICENSE file)
 #' @title Create distance map and binary image from TIFF image file
 #' @description
@@ -9,7 +9,7 @@
 #' @param Binary Logical. If TRUE, exports binary image files (default: FALSE).
 #' @param allFeatures Logical. If TRUE, exports data of all computed features (default: FALSE).
 #' @param imgType Character. Output image format: "png", "jpg", or "tiff" (default: "tiff").
-#' @param folder_paths Character vector. A character vector of folder paths to process. If NULL, a folder selection dialog will be shown. (default: "NULL").
+#' @param folder_paths Character vector. A character vector of folder paths to process. If NULL, a folder selection dialog will be shown. (default: NULL).
 #'
 #' @return This function doesn't return a value directly, but produces the following outputs:
 #' \itemize{

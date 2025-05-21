@@ -1,4 +1,4 @@
-# Copyright 2025 Your Company Name
+# Copyright 2025 National Center of Neurology and Psychiatry
 # BSD 3-Clause License (see LICENSE file)
 #' @title Axon integrity index quantification
 #' @description
