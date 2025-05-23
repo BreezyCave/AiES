@@ -5,8 +5,9 @@
 #' `axDistmap` processes TIFF image files to create distance maps and optionally binary images.
 #' It also computes various image features and exports them as a text file.
 #'
-#' @param subBack Numeric. Size of background objects to subtract (default: 30 pixels).
-#' @param Binary Logical. If TRUE, exports binary image files (default: FALSE).
+#' @param subBack Numeric. Area threshold in pixels: connected components (objects) with area less than or equal to this value will be removed as background. (default: 30).
+#' @param resizeW Numeric. Target width in pixels for resizing each imported image (default: 900 pixels).
+#' @param binaryImg Logical. If TRUE, exports binary image files (default: FALSE).
 #' @param allFeatures Logical. If TRUE, exports data of all computed features (default: FALSE).
 #' @param imgType Character. Output image format: "png", "jpg", or "tiff" (default: "tiff").
 #' @param folder_paths Character vector. A character vector of folder paths to process. If NULL, a folder selection dialog will be shown. (default: NULL).
@@ -15,7 +16,7 @@
 #' \itemize{
 #'   \item A distance map image file (format specified by `imgType`)
 #'   \item A text file containing computed image features (named "'original_filename'_'current_date'_ImageData.txt")
-#'   \item (Optional) A binary image file if `Binary = TRUE` (format specified by `imgType`)
+#'   \item (Optional) A binary image file if `binaryImg = TRUE` (format specified by `imgType`)
 #' }
 #'
 #' @details
@@ -62,14 +63,14 @@
 #' axDistmap()
 #'
 #' # Create binary images and export all EBImage features plus Circularity as PNG
-#' axDistmap(subBack = 50, Binary = TRUE, allFeatures = TRUE, imgType = "png")
+#' axDistmap(subBack = 50, binaryImg = TRUE, allFeatures = TRUE, imgType = "png")
 #'
 #' # Process images and export as TIFF without binary images
 #' # Only exports features needed for SVM learning
-#' axDistmap(subBack = 20, Binary = FALSE, allFeatures = FALSE, imgType = "tiff")
+#' axDistmap(subBack = 20, binaryImg = FALSE, allFeatures = FALSE, imgType = "tiff")
 #'
 #' # Export all EBImage features plus Circularity without creating binary images
-#' axDistmap(Binary = FALSE, allFeatures = TRUE)
+#' axDistmap(binaryImg = FALSE, allFeatures = TRUE)
 #' }
 #'
 #' @import stringr colorspace dplyr
@@ -82,7 +83,7 @@
 #' @export
 
 
-axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType = "tiff", folder_paths = NULL){
+axDistmap <- function(subBack = 30, resizeW = 900, binaryImg = FALSE, allFeatures = FALSE, imgType = "tiff", folder_paths = NULL){
 
     ###imgType check
     if(!(imgType %in% c("tiff","png","jpg"))) imgType <- "tiff"
@@ -94,7 +95,7 @@ axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType
     ##library("EBImage")
     ##library("dplyr")
     ##subBack <- 30
-    ##Binary = "TRUE"
+    ##binaryImg = "TRUE"
     ##allFeatures = "TRUE"
     ##imgType = "tiff"
     ##folder_paths <- NULL
@@ -202,7 +203,7 @@ axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType
             ##}
 
 
-            tmpImage <- resize(tmpImage, w = 900)#15Jun11:696 22Apr15:900
+            tmpImage <- resize(tmpImage, w = resizeW)#15Jun11:696 22Apr15:900
             contrastST <- (1/(1+(0.5/tmpImage[,,1])^5))
             medFltr <- medianFilter(contrastST,1)
             logTrsf <- (log1p(medFltr)/log1p(max(medFltr)))
@@ -247,7 +248,7 @@ axDistmap <- function(subBack = 30, Binary = FALSE, allFeatures = FALSE, imgType
                         sep="\t", row.names=FALSE, quote=FALSE, col.names=TRUE, append=FALSE)
             message(sprintf("%s_%s_ImageData.txt", basename(file), sdate))
 
-            if (Binary == TRUE) {
+            if (binaryImg == TRUE) {
                 dmrmabw <- 1*(bnrySeg > 0)
                 file.name <- file.path(output_dir, paste0(basename(file), "_", sdate, "_Binary.", imgType))
                 writeImage(dmrmabw, file.name, type = imgType, quality = 100)
