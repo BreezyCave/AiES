@@ -6,11 +6,14 @@
 #' It also computes various image features and exports them as a text file.
 #'
 #' @param subBack Numeric. Area threshold in pixels: connected components (objects) with area less than or equal to this value will be removed as background. (default: 30).
-#' @param resizeW Numeric. Target width in pixels for resizing each imported image (default: 900 pixels).
+#' @param resizeW Numeric. Target width in pixels for resizing each imported image (default: 900).
+#' Larger values preserve more image detail and may improve analysis accuracy, but also increase memory usage and computation time.
+#' Note that while higher resolutions can enhance result quality, beyond a certain point, further increasing the image size yields diminishing returns in accuracy but continues to increase computational cost.
 #' @param binaryImg Logical. If TRUE, exports binary image files (default: FALSE).
 #' @param allFeatures Logical. If TRUE, exports data of all computed features (default: FALSE).
 #' @param imgType Character. Output image format: "png", "jpg", or "tiff" (default: "tiff").
 #' @param folder_paths Character vector. A character vector of folder paths to process. If NULL, a folder selection dialog will be shown. (default: NULL).
+#' @param output_path Character vector. A character vector of folder paths to process. If NULL, a folder selection dialog will be shown. (default: NULL).
 #'
 #' @return This function doesn't return a value directly, but produces the following outputs:
 #' \itemize{
@@ -60,17 +63,23 @@
 #' \dontrun{
 #' # Basic usage with default parameters
 #' # Exports only features needed for SVM learning
+#' # NOTE: This example requires a GUI environment for interactive folder selection.
 #' axDistmap()
 #'
 #' # Create binary images and export all EBImage features plus Circularity as PNG
-#' axDistmap(subBack = 50, binaryImg = TRUE, allFeatures = TRUE, imgType = "png")
+#' img_dir <- system.file("extdata", "Degenerate_Images", package = "AiES")
+#' axDistmap(subBack = 50, binaryImg = TRUE, allFeatures = TRUE, imgType = "png",
+#' folder_paths = img_dir, output_path = tempdir())
 #'
 #' # Process images and export as TIFF without binary images
 #' # Only exports features needed for SVM learning
-#' axDistmap(subBack = 20, binaryImg = FALSE, allFeatures = FALSE, imgType = "tiff")
+#' img_dir <- system.file("extdata", "Degenerate_Images", package = "AiES")
+#' axDistmap(subBack = 20, binaryImg = FALSE, allFeatures = FALSE, imgType = "tiff",
+#' folder_paths = img_dir, output_path = tempdir())
 #'
 #' # Export all EBImage features plus Circularity without creating binary images
-#' axDistmap(binaryImg = FALSE, allFeatures = TRUE)
+#' img_dir <- system.file("extdata", "Degenerate_Images", package = "AiES")
+#' axDistmap(binaryImg = FALSE, allFeatures = TRUE,folder_paths = img_dir, output_path = tempdir())
 #' }
 #'
 #' @import stringr colorspace dplyr
@@ -83,7 +92,13 @@
 #' @export
 
 
-axDistmap <- function(subBack = 30, resizeW = 900, binaryImg = FALSE, allFeatures = FALSE, imgType = "tiff", folder_paths = NULL){
+axDistmap <- function(subBack = 30,
+                      resizeW = 900,
+                      binaryImg = FALSE,
+                      allFeatures = FALSE,
+                      imgType = "tiff",
+                      folder_paths = NULL,
+                      output_path = NULL){
 
     ###imgType check
     if(!(imgType %in% c("tiff","png","jpg"))) imgType <- "tiff"
@@ -108,13 +123,13 @@ axDistmap <- function(subBack = 30, resizeW = 900, binaryImg = FALSE, allFeature
     ###############Definition of function######################
     ##Function 1
     ## Functions are executed depending on the user environment
-    select_folder <- function() {
+    select_folder <- function(caption = "Select folder") {
         if (rstudioapi::isAvailable()) {
-            return(rstudioapi::selectDirectory(caption = "Select folder"))
+            return(rstudioapi::selectDirectory(caption = caption))
         } else if (requireNamespace("tcltk", quietly = TRUE)) {
-            return(tcltk::tk_choose.dir(caption = "Select folder"))
+            return(tcltk::tk_choose.dir(caption = caption))
         } else if (requireNamespace("svDialogs", quietly = TRUE)) {
-            return(svDialogs::dlg_dir(title = "Select folder")$res)
+            return(svDialogs::dlg_dir(title = caption)$res)
         } else {
             message("No GUI folder selection method available")
             return(NULL)
@@ -163,6 +178,14 @@ axDistmap <- function(subBack = 30, resizeW = 900, binaryImg = FALSE, allFeature
         return(NULL)
     }
 
+    # 3. 出力ディレクトリの選択
+    if (is.null(output_path)) {
+        output_path <- select_folder("Select output folder")
+        if (is.null(output_path) || output_path == "") output_path <- getwd()
+    }
+    if (!dir.exists(output_path)) dir.create(output_path, recursive = TRUE)
+
+
 
     # 各フォルダを処理
     results <- lapply(folder_paths, function(folder_path) {
@@ -185,7 +208,7 @@ axDistmap <- function(subBack = 30, resizeW = 900, binaryImg = FALSE, allFeature
             message(sprintf("Processing file: %s", file))
 
             # 出力先フォルダ名の作成
-            output_dir <- file.path(dirname(file),
+            output_dir <- file.path(output_path,
                                     paste0(basename(folder_path), "_", sdate, "_output_files"))
             if (!dir.exists(output_dir)) dir.create(output_dir)
 

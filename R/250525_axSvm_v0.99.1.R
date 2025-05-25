@@ -75,32 +75,37 @@
 #' @examples
 #' \dontrun{
 #' # Interactive mode with GUI prompts
+#' # NOTE: This example requires a GUI environment for interactive folder selection.
 #' axSvm()
 #'
 #' # Direct path specification
-#' axSvm(
-#'   degenerate_path = "data/deg_features",
-#'   intact_path = "data/intact_features",
-#'   output_data_path = "results/features_2025.tsv",
-#'   output_model_path = "models/svm_model_2025.svm"
-#' )
-#'
+#' deg_dir <- system.file("extdata", "Degenerate_txt", package = "AiES")
+#' int_dir <- system.file("extdata", "Intact_txt", package = "AiES")
+#' axSvm(degenerate_path = deg_dir, intact_path = int_dir,
+#'       output_data_path = file.path(tempdir(), "svm_test_data.txt"),
+#'       output_model_path = file.path(tempdir(), "svm_test_model.svm"))
 #'
 #' # Specify only output directory; default file names will be used
-#' axSvm(
-#'   degenerate_path = "data/degenerate",
-#'   intact_path = "data/intact",
-#'   output_data_path = "results/",       # specify directory only
-#'   output_model_path = "results/"       # specify directory only
+#' deg_dir <- system.file("extdata", "Degenerate_txt", package = "AiES")
+#' int_dir <- system.file("extdata", "Intact_txt", package = "AiES")
+#' axSvm(degenerate_path = deg_dir, intact_path = int_dir,
+#'   output_data_path = "tempdir()",       # specify directory only
+#'   output_model_path = "tempdir()"       # specify directory only
 #' )
 #' # In this case, output files will be saved as:
 #' #   results/YYYY-MM-DD_Extracted_data_for_ML.txt
 #' #   results/YYYY-MM-DD_AxClassifier.svm
 #' # (YYYY-MM-DD is the current date)
-#' }
+#'
 #'
 #' # Custom hyperparameters
-#' axSvm(nCst = 5, nGmm = 0.05, nCrss = 10)
+#' deg_dir <- system.file("extdata", "Degenerate_txt", package = "AiES")
+#' int_dir <- system.file("extdata", "Intact_txt", package = "AiES")
+#' axSvm(degenerate_path = deg_dir, intact_path = int_dir,
+#'      nCst = 5, nGmm = 0.05, nCrss = 10,
+#'   output_data_path = "tempdir()",       # specify directory only
+#'   output_model_path = "tempdir()"       # specify directory only
+#' )
 #' }
 #'
 #' @importFrom data.table fread rbindlist fwrite
@@ -179,6 +184,32 @@ axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5,
         return(new_filepath)
     }
 
+    ##Function 4 出力先を指定する関数
+    output_path <- function(path, default_name, select_save_file_fun, caption = "Save file as") {
+        # GUIまたは手動入力
+        if (is.null(path)) {
+            resolved <- select_save_file_fun(default_name, caption = caption)
+            if (is.null(resolved) || resolved == "") return(NULL)
+            path <- resolved
+        }
+        # 既存ディレクトリならdefault_nameで保存
+        if (dir.exists(path)) {
+            path <- file.path(path, default_name)
+            path <- generate_unique_filename(path)
+        } else if (file.exists(path)) {
+            # 既存ファイルなら重複回避
+            path <- generate_unique_filename(path)
+        } else {
+            # 存在しないパス
+            folder_part <- dirname(path)
+            if (!dir.exists(folder_part)) {
+                warning(sprintf("Directory '%s' does not exist. Saving to current directory.", folder_part))
+                path <- generate_unique_filename(default_name)
+            }
+            # フォルダが存在すればそのまま（重複チェック済み）
+        }
+        return(path)
+    }
 
     # 1. 入力データの取得
     if (is.null(degenerate_path)) {
@@ -252,7 +283,7 @@ axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5,
         }
         # tcltk
         if (requireNamespace("tcltk", quietly = TRUE)) {
-            path <- tcltk::tk_getSaveFile(initialfile = default_name, title = caption)
+            path <- tcltk::tkgetSaveFile(initialfile = default_name, title = caption)
             if (!is.null(path) && path != "") return(path)
         }
         # svDialogs
@@ -275,65 +306,29 @@ axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5,
 
 
     # 出力データファイルの保存先
-    default_name <- paste0(Sys.Date(), "_Extracted_data_for_ML.txt")
-    if (is.null(output_data_path)) {
-        output_data_path <- select_save_file(default_name, caption = "Save extracted data file")
-        if (is.null(output_data_path) || output_data_path == "") return(message("Canceled"))
-    } else {
-        # １. 指定パスが既存ディレクトリの場合 その中にdefault_nameで保存（重複回避）
-        if (dir.exists(output_data_path)) {
-            output_data_path <- file.path(output_data_path, default_name)
-            output_data_path <- generate_unique_filename(output_data_path)
-        } else if (file.exists(output_data_path)) {
-            # ２. 指定パスが既存ファイルの場合　重複回避
-            output_data_path <- generate_unique_filename(output_data_path)
-        } else {
-            # 3. 指定パスが存在しない場合
-            #   フォルダ部分が存在するかを確認
-            folder_part <- dirname(output_data_path)
-            if (!dir.exists(folder_part)) {
-                # フォルダも存在しない場合、カレントディレクトリにdefault_nameで保存（重複回避）
-                warning(sprintf("Directory '%s' does not exist. Saving to current directory.", folder_part))
-                output_data_path <- generate_unique_filename(default_name)
-            }
-            # フォルダが存在していれば、そのままoutput_data_pathを使用
-            # （重複チェックは不要：file.exists()=FALSEが前提）
-        }
-    }
-
+    default_data_name <- paste0(Sys.Date(), "_Extracted_data_for_ML.txt")
+    output_data_path <- output_path(
+        output_data_path,
+        default_data_name,
+        select_save_file,
+        caption = "Save extracted data file"
+    )
+    if (is.null(output_data_path) || output_data_path == "") return(message("Canceled"))
     data.table::fwrite(dataSvm, file = output_data_path, sep = "\t")
     message("Extracted data saved: ", output_data_path)
 
-    # 出力データファイルの保存先
-    default_name <- paste0(Sys.Date(), "_AxClassifier.svm")
-    if (is.null(output_model_path)) {
-        output_model_path <- select_save_file(default_name, caption = "Save SVM model")
-        if (is.null(output_model_path) || output_model_path == "") return(message("Canceled"))
-    } else {
-        # １. 指定パスが既存ディレクトリの場合 その中にdefault_nameで保存（重複回避）
-        if (dir.exists(output_model_path)) {
-            output_model_path <- file.path(output_model_path, default_name)
-            output_model_path <- generate_unique_filename(output_model_path)
-        } else if (file.exists(output_model_path)) {
-            # ２. 指定パスが既存ファイルの場合　重複回避
-            output_model_path <- generate_unique_filename(output_model_path)
-        } else {
-            # 3. 指定パスが存在しない場合
-            #   フォルダ部分が存在するかを確認
-            folder_part <- dirname(output_model_path)
-            if (!dir.exists(folder_part)) {
-                # フォルダも存在しない場合、カレントディレクトリにdefault_nameで保存（重複回避）
-                warning(sprintf("Directory '%s' does not exist. Saving to current directory.", folder_part))
-                output_model_path <- generate_unique_filename(default_name)
-            }
-            # フォルダが存在していれば、そのままoutput_model_pathを使用
-            # （重複チェックは不要：file.exists()=FALSEが前提）
-        }
-    }
-
-
+    # モデルファイルの保存先
+    default_model_name <- paste0(Sys.Date(), "_AxClassifier.svm")
+    output_model_path <- output_path(
+        output_model_path,
+        default_model_name,
+        select_save_file,
+        caption = "Save SVM model"
+    )
+    if (is.null(output_model_path) || output_model_path == "") return(message("Canceled"))
     save(svmModel, file = output_model_path)
     message("SVM model saved: ", output_model_path)
+
 
     invisible(svmModel)
 
