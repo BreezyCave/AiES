@@ -71,6 +71,10 @@
 #' img_dir <- system.file("extdata", "Degenerate_Images", package = "AiES")
 #' axDistmap(subBack = 50, binaryImg = TRUE, allFeatures = TRUE, imgType = "png",
 #' folder_paths = img_dir, output_path = tempdir())
+
+#' # Export all EBImage features plus Circularity without creating binary images
+#' img_dir <- system.file("extdata", "Degenerate_Images", package = "AiES")
+#' axDistmap(binaryImg = FALSE, allFeatures = TRUE,folder_paths = img_dir, output_path = tempdir())
 #' }
 #'
 #' # Process images and export as TIFF without binary images
@@ -79,11 +83,6 @@
 #' axDistmap(subBack = 20, binaryImg = FALSE, allFeatures = FALSE, imgType = "tiff",
 #' folder_paths = img_dir, output_path = tempdir())
 #'
-#' \dontrun{
-#' # Export all EBImage features plus Circularity without creating binary images
-#' img_dir <- system.file("extdata", "Degenerate_Images", package = "AiES")
-#' axDistmap(binaryImg = FALSE, allFeatures = TRUE,folder_paths = img_dir, output_path = tempdir())
-#' }
 #'
 #' @import stringr colorspace dplyr
 #' @importFrom EBImage readImage resize medianFilter thresh makeBrush opening closing distmap bwlabel rmObjects normalize computeFeatures.shape computeFeatures.haralick computeFeatures.moment writeImage channel

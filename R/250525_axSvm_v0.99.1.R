@@ -85,6 +85,15 @@
 #' axSvm(degenerate_path = deg_dir, intact_path = int_dir,
 #'       output_data_path = file.path(tempdir(), "svm_test_data.txt"),
 #'       output_model_path = file.path(tempdir(), "svm_test_model.svm"))
+#'
+#' # Custom hyperparameters
+#' deg_dir <- system.file("extdata", "Degenerate_txt", package = "AiES")
+#' int_dir <- system.file("extdata", "Intact_txt", package = "AiES")
+#' axSvm(degenerate_path = deg_dir, intact_path = int_dir,
+#'      nCst = 5, nGmm = 0.05, nCrss = 10,
+#'   output_data_path = tempdir(),       # specify directory only
+#'   output_model_path = tempdir()       # specify directory only
+#' )
 #' }
 #'
 #' # Specify only output directory; default file names will be used
@@ -99,16 +108,6 @@
 #' #   results/YYYY-MM-DD_Extracted_data_for_ML.txt
 #' #   results/YYYY-MM-DD_AxClassifier.svm
 #' # (YYYY-MM-DD is the current date)
-#'
-#' \dontrun{
-#' # Custom hyperparameters
-#' deg_dir <- system.file("extdata", "Degenerate_txt", package = "AiES")
-#' int_dir <- system.file("extdata", "Intact_txt", package = "AiES")
-#' axSvm(degenerate_path = deg_dir, intact_path = int_dir,
-#'      nCst = 5, nGmm = 0.05, nCrss = 10,
-#'   output_data_path = tempdir(),       # specify directory only
-#'   output_model_path = tempdir()       # specify directory only
-#' )}
 #'
 #' @importFrom data.table fread rbindlist fwrite
 #' @importFrom e1071 svm

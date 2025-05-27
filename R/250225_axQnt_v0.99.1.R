@@ -71,6 +71,12 @@
 #' img_dir <- system.file("extdata", "Degenerate_Images", package = "AiES")
 #' svm_model <- system.file("extdata", "svm_example_model.svm", package = "AiES")
 #' axQnt(imprtImg = TRUE, svm_model_path = svm_model, input_dirs = img_dir, output_dir = tempdir())
+#'
+#' # Process with custom image resize and background threshold
+#' img_dir <- system.file("extdata", "Intact_Images", package = "AiES")
+#' svm_model <- system.file("extdata", "svm_example_model.svm", package = "AiES")
+#' axQnt(imprtImg = TRUE, resizeW = 700, subBack = 50,
+#' svm_model_path = svm_model, input_dirs = img_dir, output_dir = tempdir())
 #' }
 #'
 #' # Utilize package-included precomputed feature data from .txt files
@@ -79,19 +85,11 @@
 #' svm_model <- system.file("extdata", "svm_example_model.svm", package = "AiES")
 #' axQnt(imprtImg = FALSE, svm_model_path = svm_model, input_dirs = txt_dir, output_dir = tempdir())
 #'
-#'\dontrun{
-#' # Process with custom image resize and background threshold
-#' img_dir <- system.file("extdata", "Intact_Images", package = "AiES")
-#' svm_model <- system.file("extdata", "svm_example_model.svm", package = "AiES")
-#' axQnt(imprtImg = TRUE, resizeW = 700, subBack = 50,
-#' svm_model_path = svm_model, input_dirs = img_dir, output_dir = tempdir())
-#' }
 #'
 #' @import stringr dplyr
 #' @importFrom data.table fread fwrite rbindlist data.table
 #' @importFrom EBImage readImage resize medianFilter thresh makeBrush opening closing distmap bwlabel rmObjects normalize computeFeatures.shape computeFeatures.haralick computeFeatures.moment
 #' @importFrom stats predict na.omit
-
 #' @export
 #'
 #'

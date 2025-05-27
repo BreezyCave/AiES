@@ -94,22 +94,22 @@ EBImage::computeFeatures.shape.
 # Exports only features needed for SVM learning
 # NOTE: This example requires a GUI environment for interactive folder selection.
 axDistmap()
-}
+
 
 # Create binary images and export all EBImage features plus Circularity as PNG
 img_dir <- system.file("extdata", "Degenerate_Images", package = "AiES")
 axDistmap(subBack = 50, binaryImg = TRUE, allFeatures = TRUE, imgType = "png",
 folder_paths = img_dir, output_path = tempdir())
+# Export all EBImage features plus Circularity without creating binary images
+img_dir <- system.file("extdata", "Degenerate_Images", package = "AiES")
+axDistmap(binaryImg = FALSE, allFeatures = TRUE,folder_paths = img_dir, output_path = tempdir())
+}
 
 # Process images and export as TIFF without binary images
 # Only exports features needed for SVM learning
 img_dir <- system.file("extdata", "Degenerate_Images", package = "AiES")
 axDistmap(subBack = 20, binaryImg = FALSE, allFeatures = FALSE, imgType = "tiff",
 folder_paths = img_dir, output_path = tempdir())
-
-# Export all EBImage features plus Circularity without creating binary images
-img_dir <- system.file("extdata", "Degenerate_Images", package = "AiES")
-axDistmap(binaryImg = FALSE, allFeatures = TRUE,folder_paths = img_dir, output_path = tempdir())
 
 
 }

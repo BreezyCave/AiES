@@ -46,6 +46,15 @@ axDistmap(
 )
 
 ```
+### Exporting All Features
+
+```r
+axDistmap(
+  folder_paths = img_dir1,
+  allFeatures = TRUE,
+  output_path = tempdir()
+)
+```
 
 This function processes all TIFF files in the selected directories, generating for each image:
 - A distance map image
@@ -93,30 +102,6 @@ This function generates:
 - A summary CSV file containing the Axon Integrity Index and Degeneration Index for each image
 - (Optional) Single image prediction data files
 
-##Advanced Usage
-
-### Parallel Processing
-
-```r
-library(future)
-plan(multisession)
-
-img_dirs <- c(img_dir1, img_dir2)
-results <- future_lapply(img_dirs, function(dir) {
-  axQnt(input_dir = dir, svm_model_path = "model.svm")
-})
-
-
-```
-### Exporting All Features
-
-```r
-axDistmap(
-  folder_paths = img_dir1,
-  allFeatures = TRUE,
-  output_path = tempdir()
-)
-```
 ### License
 AiES is licensed under the BSD 3-Clause License.
 See the LICENSE file for details.
