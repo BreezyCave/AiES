@@ -65,26 +65,27 @@
 #' # Interactive mode: process .tiff images with GUI dialogs
 #' # NOTE: This example requires a GUI environment for interactive folder selection.
 #' axQnt(imprtImg = TRUE, expSip = TRUE)
-#' }
-
+#'
+#'
 #' # Utilize package-included image folder and output to temporary directory
 #' img_dir <- system.file("extdata", "Degenerate_Images", package = "AiES")
 #' svm_model <- system.file("extdata", "svm_example_model.svm", package = "AiES")
 #' axQnt(imprtImg = TRUE, svm_model_path = svm_model, input_dirs = img_dir, output_dir = tempdir())
-
+#' }
+#'
 #' # Utilize package-included precomputed feature data from .txt files
 #' # and output to temporary directory
 #' txt_dir <- system.file("extdata", "Degenerate_txt", package = "AiES")
 #' svm_model <- system.file("extdata", "svm_example_model.svm", package = "AiES")
 #' axQnt(imprtImg = FALSE, svm_model_path = svm_model, input_dirs = txt_dir, output_dir = tempdir())
 #'
-#'
+#'\dontrun{
 #' # Process with custom image resize and background threshold
 #' img_dir <- system.file("extdata", "Intact_Images", package = "AiES")
 #' svm_model <- system.file("extdata", "svm_example_model.svm", package = "AiES")
 #' axQnt(imprtImg = TRUE, resizeW = 700, subBack = 50,
 #' svm_model_path = svm_model, input_dirs = img_dir, output_dir = tempdir())
-#'
+#' }
 #'
 #' @import stringr dplyr
 #' @importFrom data.table fread fwrite rbindlist data.table
