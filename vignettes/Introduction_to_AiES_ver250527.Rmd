@@ -52,6 +52,7 @@ output_path = tempdir()
 ```
 
 This function processes all TIFF files in the selected directory, generating for each image:
+
 - A distance map image
 - A binary image (optional)
 - A text file containing feature data
@@ -77,6 +78,7 @@ nCst = 3, nGmm = 0.1, nCrss = 5
 ```
 
 This function generates:
+
 - An extracted data file for machine learning
 - A trained SVM model file
 
@@ -104,6 +106,7 @@ ggtitle("AII Distribution")
 ```
 
 This function generates:
+
 - A summary CSV file containing the Axon Integrity Index and Degeneration Index for each image
 - (Optional) Single image prediction data files
 

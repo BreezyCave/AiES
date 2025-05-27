@@ -22,7 +22,7 @@
 #'        If a file name already exists, a unique name will be generated.(default: NULL)
 #' @param nCst Numeric. SVM cost parameter (C-value) controlling margin hardness.
 #'        Higher values increase model complexity. (default: 3)
-#' @param nGmm Numeric. SVM gamma parameter (γ-value) controlling RBF kernel width.
+#' @param nGmm Numeric. SVM gamma parameter ( (\eqn{\gamma})-value) controlling RBF kernel width.
 #'        Smaller values mean larger kernel radius. (default: 0.1)
 #' @param nCrss Integer. Number of folds for cross-validation.
 #'        Recommended values 5-10. (default: 5)
@@ -112,23 +112,8 @@
 #' @importFrom data.table fread rbindlist fwrite
 #' @importFrom e1071 svm
 #' @importFrom utils choose.files
+#'
 #' @export
-
-
-######################Codes for test run
-##library("dplyr")
-##library("e1071")
-##library("stringr")
-##library("ggpubr")
-##library("data.table")
-##degenerate_path = "D:/NCNP/01 R&D Eng/01 Projects/04 R package/02 R&D/Test/240424 AiES test/Degenerate_txt",
-##intact_path = "D:/NCNP/01 R&D Eng/01 Projects/04 R package/02 R&D/Test/240424 AiES test/Intact_txt",
-##output_data_path = "D:/NCNP/01 R&D Eng/01 Projects/04 R package/02 R&D/Test/240424 AiES test/svm 250522 localtest",
-##output_model_path = "D:/NCNP/01 R&D Eng/01 Projects/04 R package/02 R&D/Test/240424 AiES test/svm 250522 localtest",
-#######################################
-
-
-
 axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5,
                   degenerate_path = NULL,
                   intact_path = NULL,

@@ -1,7 +1,7 @@
 Package: AiES
 Type: Package
 Title: Axon Integrity Evaluation System
-Version: 0.99.1
+Version: 0.99.3
 Authors@R: c(
   person("Shinji", "Tokunaga", email = "tokunaga@ncnp.go.jp", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8398-3054")),
   person("Masafumi", "Funakoshi", email = "funakoshi@ncnp.go.jp", role = "ctb"),
@@ -14,7 +14,6 @@ Copyright: 2025 National Center of Neurology and Psychiatry
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
-biocViews: Software, AssayDomain, CellBasedAssays
 URL: https://github.com/BreezyCave/AiES
 BugReports: https://github.com/BreezyCave/AiES/issues
 Imports: 

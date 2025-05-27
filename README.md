@@ -110,7 +110,7 @@ See the LICENSE file for details.
 
 If you use AiES in your research, please cite:
 
-Tokunaga S, Funakoshim M, Araki T, et al. AiES: Axon Image Analysis Workflow. National Center of Neurology and Psychiatry, 2025.
+Tokunaga S, Funakoshim M, Araki T, et al. AiES: Axon integrity Evaluation System. National Center of Neurology and Psychiatry, 2025.
 
 
 ## Contact

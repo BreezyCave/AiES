@@ -78,9 +78,10 @@
 #' }
 #'
 #' # Process images and export as TIFF without binary images
+#' # Process with custom image resize and background threshold
 #' # Only exports features needed for SVM learning
 #' img_dir <- system.file("extdata", "Degenerate_Images", package = "AiES")
-#' axDistmap(subBack = 20, binaryImg = FALSE, allFeatures = FALSE, imgType = "tiff",
+#' axDistmap(subBack = 20, resizeW = 300, binaryImg = FALSE, allFeatures = FALSE, imgType = "png",
 #' folder_paths = img_dir, output_path = tempdir())
 #'
 #'
@@ -92,8 +93,6 @@
 #' @importFrom fs dir_ls
 #'
 #' @export
-
-
 axDistmap <- function(subBack = 30,
                       resizeW = 900,
                       binaryImg = FALSE,
@@ -105,21 +104,6 @@ axDistmap <- function(subBack = 30,
     ###imgType check
     if(!(imgType %in% c("tiff","png","jpg"))) imgType <- "tiff"
 
-    #### #test code for debug
-    ##library("EBImage")
-    ##library("stringr")
-    ##library("colorspace")
-    ##library("EBImage")
-    ##library("dplyr")
-    ##subBack <- 30
-    ##binaryImg = "TRUE"
-    ##allFeatures = "TRUE"
-    ##imgType = "tiff"
-    ##folder_paths <- NULL
-    ##folder_paths = c("D:/NCNP/01 R&D Eng/01 Projects/04 R package/02 R&D/RStudio/AiES/inst/extdata/Degenerate_Images,
-    ##                 "D:/NCNP/01 R&D Eng/01 Projects/04 R package/02 R&D/RStudio/AiES/inst/extdata/Intact_Images")
-    #########################
-    ###############Definition of variable######################
 
     sdate <- Sys.Date()
     ###############Definition of function######################

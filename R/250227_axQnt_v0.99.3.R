@@ -90,27 +90,8 @@
 #' @importFrom data.table fread fwrite rbindlist data.table
 #' @importFrom EBImage readImage resize medianFilter thresh makeBrush opening closing distmap bwlabel rmObjects normalize computeFeatures.shape computeFeatures.haralick computeFeatures.moment
 #' @importFrom stats predict na.omit
+#'
 #' @export
-#'
-#'
-
-######################Codes for test run
-##library("data.table")
-##library("dplyr")
-##library("stringr")
-##library("EBImage")
-##library("stats")
-
-##以下は不要250523
-##library("ggpubr")
-##library("colorspace")
-
-##subBack <- 30
-##imprtImg = FALSE
-##expSip = TRUE
-###############Definition of variable######################
-
-
 axQnt <- function(imprtImg = TRUE,
                   subBack = 30,
                   resizeW = 900,
@@ -122,7 +103,6 @@ axQnt <- function(imprtImg = TRUE,
 
     sdate <- Sys.Date()
     txtGroup <- c("Degenerate","Intact")
-    #Ftr.tmp <- c("Group","m.eccentricity","s.radius.sd","h.sva.s2","h.idm.s1","h.sen.s1","m.majoraxis")
     ftrSvm <- c("m.eccentricity","s.radius.sd","h.sva.s2","h.idm.s1","h.sen.s1","m.majoraxis")
     rltName <- c("FileName","AxonIntegrityIndex","DegenerationIndex")
 
