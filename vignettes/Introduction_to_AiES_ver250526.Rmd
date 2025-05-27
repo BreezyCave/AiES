@@ -4,7 +4,7 @@ author: "Shinji Tokunaga, Masafumi Funakoshim, Toshiyuki Araki"
 email: tokunaga@ncnp.go.jp
 package: AiES
 abstract: >
- `r BiocStyle::Biocpkg("AiES")` is a free and open-source R-package for (high-throughput) axonal integrity analysis of micrographs such as murine dorsal root ganglia explant cultures. `r BiocStyle::Biocpkg("AiES")` offers tools to segment neurites, extract quantitative features, generate SVM models, and quantify axon integrity.`r BiocStyle::Biocpkg("AiES")` is available via GitHub at https://github.com/BreezyCave/AiES under the 3-Clause BSD license. 
+ AiES is a free and open-source R-package for (high-throughput) axonal integrity analysis of micrographs such as murine dorsal root ganglia explant cultures. AiES offers tools to segment neurites, extract quantitative features, generate SVM models, and quantify axon integrity.AiES is available under the 3-Clause BSD license. 
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 graphics: yes
@@ -139,3 +139,8 @@ output_path = tempdir()
 With AiES, you can perform **feature extraction, machine learning, and quantitative analysis** in a seamless workflow.  
 For more details, see the help pages for each function (e.g., `?axDistmap`, `?axSvm`, `?axQnt`).
 
+# Source code and issues
+
+You can find the development version of AiES on [GitHub](https://github.com/BreezyCave/AiES).
+
+For bug reports and feature requests, please use the [GitHub Issues page](https://github.com/BreezyCave/AiES/issues).
