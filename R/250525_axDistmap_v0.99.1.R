@@ -65,6 +65,7 @@
 #' # Exports only features needed for SVM learning
 #' # NOTE: This example requires a GUI environment for interactive folder selection.
 #' axDistmap()
+#' }
 #'
 #' # Create binary images and export all EBImage features plus Circularity as PNG
 #' img_dir <- system.file("extdata", "Degenerate_Images", package = "AiES")
@@ -80,7 +81,7 @@
 #' # Export all EBImage features plus Circularity without creating binary images
 #' img_dir <- system.file("extdata", "Degenerate_Images", package = "AiES")
 #' axDistmap(binaryImg = FALSE, allFeatures = TRUE,folder_paths = img_dir, output_path = tempdir())
-#' }
+#'
 #'
 #' @import stringr colorspace dplyr
 #' @importFrom EBImage readImage resize medianFilter thresh makeBrush opening closing distmap bwlabel rmObjects normalize computeFeatures.shape computeFeatures.haralick computeFeatures.moment writeImage channel
