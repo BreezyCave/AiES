@@ -4,15 +4,30 @@
 AiES offers tools to segment neurites, extract quantitative features, generate SVM models, and quantify axon integrity.
 It is released under the BSD 3-Clause License.
 
+## System requirements for Linux
+
+Before installing the AiES package or EBImage on Linux, please run:
+
+```
+sudo apt-get update
+sudo apt-get install -y libtiff5-dev libjpeg-dev libpng-dev
+```
+
 ## Installation
 
 ```r
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("EBImage")
+
 # Install from CRAN (when available)
 # install.packages("AiES")
 
 # Or install the development version from GitHub
 # install.packages("devtools")
-devtools::install_github("BreezyCave/AiES")
+#devtools::install_github("BreezyCave/AiES")
+
+
 ```
 
 ## Overview

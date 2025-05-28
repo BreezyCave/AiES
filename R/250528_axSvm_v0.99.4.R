@@ -61,7 +61,7 @@
 #'
 #' @section GUI Support:
 #' \itemize{
-#'   \item RStudio (rstudioapi), tcltk, svDialogs, and rChoiceDialogs are supported for file/folder selection.
+#'   \item RStudio (rstudioapi), tcltk and svDialogs are supported for file/folder selection.
 #'   \item If no GUI is available, the user is prompted to enter the path manually.
 #' }
 #'
@@ -129,7 +129,7 @@ axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5,
     txtGroup <- c("Degenerate","Intact")
 
     ###############Definition of function######################
-    ##Function 1 フォルダ選択
+    ##Function 1 Folder selection
     select_folder <- function(caption = "Select folder") {
         if (rstudioapi::isAvailable()) {
             return(rstudioapi::selectDirectory(caption = caption))
@@ -143,7 +143,7 @@ axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5,
         }
     }
 
-    ##Function 2 ファイル選択
+    ##Function 2 File selection
     select_files <- function(caption = "Select files") {
         if (.Platform$OS.type == "windows") {
             return(utils::choose.files(caption = caption, multi = TRUE))
@@ -156,11 +156,11 @@ axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5,
         }
     }
 
-    ##Function 3 ファイル名の重複を避ける関数
+    ##Function 3 Function to avoid duplicate file names
     generate_unique_filename <- function(filepath) {
         if (!file.exists(filepath)) return(filepath)
-        base <- sub("(\\.[^.]*)$", "", filepath)   # 拡張子前まで
-        ext <- sub("^.*(\\.[^.]*)$", "\\1", filepath) # 拡張子
+        base <- sub("(\\.[^.]*)$", "", filepath)   # before extension
+        ext <- sub("^.*(\\.[^.]*)$", "\\1", filepath) # extension
         i <- 1
         new_filepath <- paste0(base, "_", i, ext)
         while (file.exists(new_filepath)) {
@@ -170,34 +170,34 @@ axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5,
         return(new_filepath)
     }
 
-    ##Function 4 出力先を指定する関数
+    ##Function 4 Function to specify output path
     output_path <- function(path, default_name, select_save_file_fun, caption = "Save file as") {
-        # GUIまたは手動入力
+        # GUI or manual input
         if (is.null(path)) {
             resolved <- select_save_file_fun(default_name, caption = caption)
             if (is.null(resolved) || resolved == "") return(NULL)
             path <- resolved
         }
-        # 既存ディレクトリならdefault_nameで保存
+        # If an existing directory is selected, save it as default_name
         if (dir.exists(path)) {
             path <- file.path(path, default_name)
             path <- generate_unique_filename(path)
         } else if (file.exists(path)) {
-            # 既存ファイルなら重複回避
+            # Remove duplicates (if necessary)
             path <- generate_unique_filename(path)
         } else {
-            # 存在しないパス
+            # non-existent path
             folder_part <- dirname(path)
             if (!dir.exists(folder_part)) {
                 warning(sprintf("Directory '%s' does not exist. Saving to current directory.", folder_part))
                 path <- generate_unique_filename(default_name)
             }
-            # フォルダが存在すればそのまま（重複チェック済み）
+            # If the folder exists, leave it as is (duplicate checked)
         }
         return(path)
     }
 
-    # 1. 入力データの取得
+    # 1. Obtain input data
     if (is.null(degenerate_path)) {
         message("Select folder or .txt files for Degenerate condition")
         degenerate_path <- select_folder("Select Degenerate folder")
@@ -223,10 +223,9 @@ axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5,
     if (length(intact_files) == 0) return(message("No intact files found."))
 
 
-    # 2. データ読み込み（大規模対応）
+    # 2. Data reading (large-scale support)
     read_data <- function(files, group) {
         datalist <- lapply(files, function(f) {
-            # freadはdata.tableの高速読み込み
             dt <- tryCatch(data.table::fread(f), error = function(e) NULL)
             if (is.null(dt)) return(NULL)
             dt$Group <- group
@@ -242,13 +241,13 @@ axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5,
 
 
 
-    # 3. データ結合・特徴量選択
+    # 3. Data merging and feature selection
     dataSvm <- rbind(deg_data, intact_data)
     dataSvm <- dataSvm[, ..ftrTmp]
     dataSvm$Group <- as.factor(dataSvm$Group)
     rm(deg_data, intact_data); gc()
 
-    # 4. SVMモデル構築
+    # 4. SVM model construction
     svmModel <- e1071::svm(
         Group ~ .,
         data = dataSvm,
@@ -260,7 +259,7 @@ axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5,
         cross = nCrss
     )
 
-    # 5. 出力ファイルの指定
+    # 5. Specify output file
     select_save_file <- function(default_name = "output.txt", caption = "Save file as") {
         # RStudio
         if (requireNamespace("rstudioapi", quietly = TRUE) && rstudioapi::isAvailable()) {
@@ -277,12 +276,7 @@ axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5,
             path <- svDialogs::dlg_save(default = default_name, title = caption)$res
             if (!is.null(path) && path != "") return(path)
         }
-        # rChoiceDialogs
-        if (requireNamespace("rChoiceDialogs", quietly = TRUE)) {
-            path <- rChoiceDialogs::rchoose.files(default = default_name, caption = caption, new = TRUE)
-            if (!is.null(path) && path != "") return(path)
-        }
-        # 手動入力
+        # manual input
         cat(sprintf("Please enter the full path to save the file [%s]: ", default_name))
         path <- readline()
         if (path == "") path <- default_name
@@ -291,7 +285,7 @@ axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5,
 
 
 
-    # 出力データファイルの保存先
+    # Output data file save location
     default_data_name <- paste0(Sys.Date(), "_Extracted_data_for_ML.txt")
     output_data_path <- output_path(
         output_data_path,
@@ -303,7 +297,7 @@ axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5,
     data.table::fwrite(dataSvm, file = output_data_path, sep = "\t")
     message("Extracted data saved: ", output_data_path)
 
-    # モデルファイルの保存先
+    # Model file save location
     default_model_name <- paste0(Sys.Date(), "_AxClassifier.svm")
     output_model_path <- output_path(
         output_model_path,
@@ -319,12 +313,5 @@ axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5,
     invisible(svmModel)
 
 }###end of function
-
-
-
-
-
-
-
 
 

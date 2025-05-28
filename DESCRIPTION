@@ -1,7 +1,7 @@
 Package: AiES
 Type: Package
 Title: Axon Integrity Evaluation System
-Version: 0.99.3
+Version: 0.99.4
 Authors@R: c(
   person("Shinji", "Tokunaga", email = "tokunaga@ncnp.go.jp", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8398-3054")),
   person("Masafumi", "Funakoshi", email = "funakoshi@ncnp.go.jp", role = "ctb"),
@@ -31,5 +31,4 @@ Suggests:
     tcltk,
     rstudioapi,
     svDialogs,
-    rChoiceDialogs
 VignetteBuilder: knitr

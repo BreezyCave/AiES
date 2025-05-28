@@ -108,7 +108,7 @@ axQnt <- function(imprtImg = TRUE,
 
     ###############Definition of function######################
     ##Function 1
-    # クロスプラットフォームなファイル・フォルダ選択
+    # Cross-platform file/folder selection
     select_folder <- function(caption = "Select folder") {
         if (requireNamespace("rstudioapi", quietly = TRUE) && rstudioapi::isAvailable()) {
             return(rstudioapi::selectDirectory(caption = caption))
@@ -149,15 +149,15 @@ axQnt <- function(imprtImg = TRUE,
         return(new_filepath)
     }
 
-    # 1. SVMモデルのロード
+    # 1. Load the SVM model
     if (is.null(svm_model_path)) {
         svm_model_path <- select_files("Select a SVM model file")
         if (length(svm_model_path) == 0 || is.na(svm_model_path)) return(message("SVM model not selected."))
     }
 
     loaded_objects <- load(svm_model_path)
-    svm_model <- NULL##変数初期化
-    # ロードされたオブジェクトからSVMモデルを探す
+    svm_model <- NULL
+    # Finding SVM models among loaded objects
     for (obj_name in loaded_objects) {
         obj <- get(obj_name)
         if (inherits(obj, "svm")) {
@@ -170,44 +170,44 @@ axQnt <- function(imprtImg = TRUE,
         stop("No SVM model found in the loaded file", svm_model_path)
     }
 
-    # 2. 入力ディレクトリの選択
+    # 2. Select input directory
     if (is.null(input_dirs)) {
-        input_dirs <- character(0) # 初期化
+        input_dirs <- character(0) # Initialize
         continue_selection <- "y"
         repeat {
             selected_folder <- select_folder(if (imprtImg) "Select folder containing TIFF images" else "Select folder containing TXT feature files")
             if (is.null(selected_folder)) {
                 message("Folder selection cancelled.")
-                break # ループを抜ける
+                break # Exit loop
             }
-            # 選択されたフォルダが既にリストにないか確認
+            # Check if the selected folder is already in the list
             if (!(selected_folder %in% input_dirs)) {
                 input_dirs <- c(input_dirs, selected_folder)
                 message(sprintf("Added folder: %s", selected_folder))
             } else {
                 message(sprintf("Folder already selected: %s. Skipping.", selected_folder))
             }
-            # フォルダ選択を続けるか確認
+            # Ask if the user wants to continue selecting folders
             continue_selection <- readline(prompt = "Select another folder? (y/n): ")
-            if (tolower(continue_selection) != "y") {  #大文字を小文字に変換
-                break # ループを抜ける
+            if (tolower(continue_selection) != "y") {  # Convert uppercase to lowercase
+                break # Exit loop
             }
         }
-        # フォルダが一つも選択されなかった場合
+        # If no folders were selected
         if (length(input_dirs) == 0) {
             message("No input folder selected. Exiting function.")
             return(NULL)
         }
     }
 
-    # 3. 出力ディレクトリの選択
+    # 3.  Create output folder name
     if (is.null(output_dir)) {
         output_dir <- select_folder("Select output folder")
         if (is.null(output_dir) || output_dir == "") output_dir <- getwd()
     }
     if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
 
-    # 4. ファイルリスト取得（複数フォルダ＆サブフォルダ対応）
+    # 4. Get file list (multiple folders and subfolders supported)
     if (imprtImg) {
         input_files <- unlist(lapply(input_dirs, function(dir) {
             list.files(dir, pattern = "\\.tiff?$", full.names = TRUE, recursive = TRUE)
@@ -220,12 +220,12 @@ axQnt <- function(imprtImg = TRUE,
    if (length(input_files) == 0) return(message("No input files found."))
 
 
-    # 5. 画像または特徴量テーブルの処理
+    # 5. Process images or feature tables
     results_summary <- data.table::data.table(FileName = character(0), AxonIntegrityIndex = numeric(0), DegenerationIndex = numeric(0))
 
-    # lapplyで画像または特徴量テーブルの処理
+    # Processing images or feature tables with lapply
     results_list <- lapply(input_files, function(file) {
-        # 画像処理または特徴量読み込み
+        # Image processing or feature reading
         if (imprtImg) {
             message(sprintf("Processing file: %s", file))
             tmpImage <- EBImage::readImage(file)
@@ -250,30 +250,28 @@ axQnt <- function(imprtImg = TRUE,
             singleData <- data.frame(cbind(sdat, hdat, mdat))
             singleData <- na.omit(singleData)
             singleData <- singleData[, c("s.area", ftrSvm), drop = FALSE]
-            # 必要に応じてファイル保存
+
         } else {
             singleData <- tryCatch(data.table::fread(file), error = function(e) NULL)
             if (is.null(singleData)) return(NULL)
         }
-        # SVM分類
+        # SVM classification
         if (!all(ftrSvm %in% colnames(singleData))) {
             message("Required features missing in file: ", file)
             return(NULL)
         }
-        ## error 対策
+        ## error countermeasures
         singleData <- as.data.frame(singleData)
-        #pred <- predict(svm_model, singleData[, ftrSvm, with = FALSE], type = "class") #data.table
-        #pred <- predict(svm_model, singleData[, ..ftrSvm], type = "class") #data.frame
         pred <- predict(svm_model, singleData[, ftrSvm, drop = FALSE], type = "class") #data.frame
 
-        # AII/DI計算
+        # Calculate AII/DI
         intact_area <- sum((pred == "Intact") * singleData$s.area)
         deg_area <- sum((pred == "Degenerate") * singleData$s.area)
         total_area <- intact_area + deg_area
         AII <- if (total_area > 0) intact_area / total_area else NA
         DI <- if (total_area > 0) deg_area / total_area else NA
         results_summary <- rbind(results_summary, data.table::data.table(FileName = basename(file), AxonIntegrityIndex = AII, DegenerationIndex = DI))
-        # 単画像予測結果の保存
+        # Save single image prediction results
         if (expSip) {
             sip_outfile <- file.path(output_dir, paste0(basename(file), "_", sdate, "_SIP.csv"))
             sip_outfile <- generate_unique_filename(sip_outfile)
@@ -282,10 +280,10 @@ axQnt <- function(imprtImg = TRUE,
         return(data.table(FileName = basename(file), AxonIntegrityIndex = AII, DegenerationIndex = DI))
     })
 
-    # リストをdata.tableにまとめる
+    # Summarizing a list into a data.table
     results_summary <- data.table::rbindlist(results_list, fill = TRUE)
 
-    # サマリー出力
+    # Output summary
     summary_outfile <- file.path(output_dir, paste0("Summary_", sdate, ".csv"))
     summary_outfile <- generate_unique_filename(summary_outfile)
     data.table::fwrite(results_summary, file = summary_outfile, sep = ",")

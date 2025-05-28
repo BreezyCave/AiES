@@ -17,7 +17,7 @@ axDistmap(
 \arguments{
 \item{subBack}{Numeric. Area threshold in pixels: connected components (objects) with area less than or equal to this value will be removed as background. (default: 30).}
 
-\item{resizeW}{Numeric. Target width in pixels for resizing each imported image (default: 900).
+\item{resizeW}{Numeric. Target width in pixels for resizing each imported image (default: 900, recommended > 700).
 Larger values preserve more image detail and may improve analysis accuracy, but also increase memory usage and computation time.
 Note that while higher resolutions can enhance result quality, beyond a certain point, further increasing the image size yields diminishing returns in accuracy but continues to increase computational cost.}
 

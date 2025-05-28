@@ -6,7 +6,7 @@
 #' It also computes various image features and exports them as a text file.
 #'
 #' @param subBack Numeric. Area threshold in pixels: connected components (objects) with area less than or equal to this value will be removed as background. (default: 30).
-#' @param resizeW Numeric. Target width in pixels for resizing each imported image (default: 900).
+#' @param resizeW Numeric. Target width in pixels for resizing each imported image (default: 900, recommended > 700).
 #' Larger values preserve more image detail and may improve analysis accuracy, but also increase memory usage and computation time.
 #' Note that while higher resolutions can enhance result quality, beyond a certain point, further increasing the image size yields diminishing returns in accuracy but continues to increase computational cost.
 #' @param binaryImg Logical. If TRUE, exports binary image files (default: FALSE).
@@ -122,30 +122,30 @@ axDistmap <- function(subBack = 30,
         }
     }
 
-    # フォルダの選択または指定
+    # Selection or specification of folders
     if (is.null(folder_paths)) {
-        folder_paths <- character(0) # 初期化
+        folder_paths <- character(0) # Initialize
         continue_selection <- "y"
         repeat {
             selected_folder <- select_folder()
             if (is.null(selected_folder)) {
                 message("Folder selection cancelled.")
-                break # ループを抜ける
+                break # Exit loop
             }
-            # 選択されたフォルダが既にリストにないか確認
+            # Check if the selected folder is already in the list
             if (!(selected_folder %in% folder_paths)) {
                 folder_paths <- c(folder_paths, selected_folder)
                 message(sprintf("Added folder: %s", selected_folder))
             } else {
                 message(sprintf("Folder already selected: %s. Skipping.", selected_folder))
             }
-            # フォルダ選択を続けるか確認
+            # Ask if the user wants to continue selecting folders
             continue_selection <- readline(prompt = "Select another folder? (y/n): ")
-            if (tolower(continue_selection) != "y") {  #大文字を小文字に変換
-                break # ループを抜ける
+            if (tolower(continue_selection) != "y") {  # Convert uppercase to lowercase
+                break # Exit loop
             }
         }
-        # フォルダが一つも選択されなかった場合
+        # If no folders were selected
         if (length(folder_paths) == 0) {
             message("No folders selected. Exiting function.")
             return(NULL)
@@ -155,16 +155,16 @@ axDistmap <- function(subBack = 30,
     folder_paths <- as.list(folder_paths)
 
 
-    # 有効な（実際に存在する）フォルダだけを残す
+    # Keep only valid (existing) folders
     folder_paths <- Filter(dir.exists, folder_paths)
-    folder_paths <- unique(folder_paths) # 重複除去（必要なら）
+    folder_paths <- unique(folder_paths) # Remove duplicates (if necessary)
 
     if (length(folder_paths) == 0) {
         message("No valid folders to process. Exiting function.")
         return(NULL)
     }
 
-    # 3. 出力ディレクトリの選択
+    # 3. Create output folder name
     if (is.null(output_path)) {
         output_path <- select_folder("Select output folder")
         if (is.null(output_path) || output_path == "") output_path <- getwd()
@@ -173,15 +173,15 @@ axDistmap <- function(subBack = 30,
 
 
 
-    # 各フォルダを処理
+    # Process each folder
     results <- lapply(folder_paths, function(folder_path) {
         if (!dir.exists(folder_path)) {
             message(sprintf("Specified folder does not exist: %s. Skipping.", folder_path))
             return(NULL)
         }
 
-        # TIFFファイル(.tiff or .tif)の取得
-        # サブフォルダを調べるかどうか recurse = TRUE/FALSE
+        # Retrieve TIFF files (.tiff or .tif)
+        # Whether to search subfolders (recurse = TRUE/FALSE)
         tiff_files <- fs::dir_ls(folder_path, regexp = "\\.tiff?$", recurse = TRUE)
 
         if (length(tiff_files) == 0) {
@@ -189,30 +189,30 @@ axDistmap <- function(subBack = 30,
             return(NULL)
         }
 
-        # 複数のファイルを処理
+        # Process multiple files
         process_file <- function(file) {
             message(sprintf("Processing file: %s", file))
 
-            # 出力先フォルダ名の作成
+            # Create output folder name
             output_dir <- file.path(output_path,
                                     paste0(basename(folder_path), "_", sdate, "_output_files"))
             if (!dir.exists(output_dir)) dir.create(output_dir)
 
             tmpImage <- readImage(file)#file_list.name
 
-                # 二値化画像かどうかをチェック
+                # Check if the image is binary
             if (all(tmpImage %in% c(0, 1))) {
               message(sprintf("Skipping binary image: %s", file))
               return(NULL)
             }
 
-            ##    # グレースケール変換
+            ##    # Convert to grayscale
             ##if (length(dim(tmpImage)) == 3) {
             ##  tmpImage <- channel(tmpImage, "gray")
             ##}
 
 
-            tmpImage <- resize(tmpImage, w = resizeW)#15Jun11:696 22Apr15:900
+            tmpImage <- resize(tmpImage, w = resizeW)
             contrastST <- (1/(1+(0.5/tmpImage[,,1])^5))
             medFltr <- medianFilter(contrastST,1)
             logTrsf <- (log1p(medFltr)/log1p(max(medFltr)))
@@ -224,7 +224,7 @@ axDistmap <- function(subBack = 30,
             nDm <- normalize(dm)
             bnrySeg <- bwlabel(nDm)
             sdat <- as.data.frame(computeFeatures.shape(bnrySeg))
-            #######Threshold for eliminating small objects that cannot be classified by image processing
+            #######Threshold for eliminating small objects that cannnot be classified by image processing
             rma <- subBack
             rmNum <- which(sdat$s.area <= rma)
             bnrySeg <- rmObjects(bnrySeg, rmNum)
@@ -234,9 +234,6 @@ axDistmap <- function(subBack = 30,
             singleData <- data.frame(cbind(sdat, hdat, mdat))
             invisible({rm(list=c("sdat", "hdat", "mdat"));gc();gc()})
             singleData <- na.omit(singleData)
-            #if (is.numeric(singleData[,1]) == FALSE){
-            #  singleData <- sapply(singleData,num_f)
-            #}
 
             if(allFeatures == FALSE){
                 singleData <- data.frame(s.area = singleData$s.area,
@@ -280,22 +277,10 @@ axDistmap <- function(subBack = 30,
         return(folder_results)
     })
 
-    # 処理完了メッセージ
+    # Processing complete message
     message("All folders processed successfully.")
 
     ##return(NULL)
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
