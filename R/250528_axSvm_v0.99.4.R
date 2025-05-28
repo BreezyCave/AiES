@@ -111,7 +111,6 @@
 #'
 #' @importFrom data.table fread rbindlist fwrite
 #' @importFrom e1071 svm
-#' @importFrom utils choose.files
 #'
 #' @export
 axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5,

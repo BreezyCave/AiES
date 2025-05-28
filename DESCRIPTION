@@ -20,11 +20,10 @@ Imports:
     EBImage,
     e1071,
     stats,
-    utils,
     fs,
     data.table
 Suggests: 
-    ggpubr,
+    utils,
     stringr,
     colorspace,
     dplyr,
