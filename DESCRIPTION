@@ -17,18 +17,19 @@ RoxygenNote: 7.3.2
 URL: https://github.com/BreezyCave/AiES
 BugReports: https://github.com/BreezyCave/AiES/issues
 Imports: 
-    dplyr,
-    colorspace,
     EBImage,
-    stringr,
     e1071,
-    ggpubr,
     stats,
+    utils,
     fs,
     data.table
 Suggests: 
+    ggpubr,
+    stringr,
+    colorspace,
+    dplyr,
     knitr,
     tcltk,
     rstudioapi,
-    svDialogs,
+    svDialogs
 VignetteBuilder: knitr

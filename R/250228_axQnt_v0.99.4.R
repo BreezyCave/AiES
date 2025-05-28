@@ -86,7 +86,6 @@
 #' axQnt(imprtImg = FALSE, svm_model_path = svm_model, input_dirs = txt_dir, output_dir = tempdir())
 #'
 #'
-#' @import stringr dplyr
 #' @importFrom data.table fread fwrite rbindlist data.table
 #' @importFrom EBImage readImage resize medianFilter thresh makeBrush opening closing distmap bwlabel rmObjects normalize computeFeatures.shape computeFeatures.haralick computeFeatures.moment
 #' @importFrom stats predict na.omit
