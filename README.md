@@ -121,6 +121,19 @@ This function generates:
 AiES is licensed under the BSD 3-Clause License.
 See the LICENSE file for details.
 
+### Notice regarding dependencies
+
+This package makes use of the following R packages, each with its own license:
+
+- EBImage: LGPL (>= 2.1)
+- data.table: MPL-2.0
+- e1071: GPL-2 | GPL-3
+- fs: MIT
+
+Users must comply with the license terms of these dependencies when redistributing or modifying this package.  
+See each package’s CRAN/Bioconductor page for full license texts.
+
+
 ### Citation
 
 If you use AiES in your research, please cite:

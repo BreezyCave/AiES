@@ -73,13 +73,15 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
 #' # Interactive mode with GUI prompts
 #' # NOTE: This example requires a GUI environment for interactive folder selection.
+#' if（interactive（））{
 #' axSvm()
+#' }
 #'
 #'
 #' # Direct path specification
+#' \donttest{
 #' deg_dir <- system.file("extdata", "Degenerate_txt", package = "AiES")
 #' int_dir <- system.file("extdata", "Intact_txt", package = "AiES")
 #' axSvm(degenerate_path = deg_dir, intact_path = int_dir,
@@ -116,8 +118,8 @@
 axSvm <- function(nCst = 3, nGmm = 0.1, nCrss=5,
                   degenerate_path = NULL,
                   intact_path = NULL,
-                  output_data_path = NULL,
-                  output_model_path = NULL
+                  output_data_path = tempdir(),
+                  output_model_path = tempdir()
 ){
 
 

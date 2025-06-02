@@ -60,14 +60,16 @@
 #' - If allFeatures = TRUE, all features from EBImage package plus Circularity are exported.
 #'
 #' @examples
-#' \dontrun{
+#'
 #' # Basic usage with default parameters
 #' # Exports only features needed for SVM learning
 #' # NOTE: This example requires a GUI environment for interactive folder selection.
+#' if（interactive（））{
 #' axDistmap()
-#'
+#' }
 #'
 #' # Create binary images and export all EBImage features plus Circularity as PNG
+#' \donttest{
 #' img_dir <- system.file("extdata", "Degenerate_Images", package = "AiES")
 #' axDistmap(subBack = 50, binaryImg = TRUE, allFeatures = TRUE, imgType = "png",
 #' folder_paths = img_dir, output_path = tempdir())
@@ -97,7 +99,7 @@ axDistmap <- function(subBack = 30,
                       allFeatures = FALSE,
                       imgType = "tiff",
                       folder_paths = NULL,
-                      output_path = NULL){
+                      output_path = tempdir()){
 
     ###imgType check
     if(!(imgType %in% c("tiff","png","jpg"))) imgType <- "tiff"

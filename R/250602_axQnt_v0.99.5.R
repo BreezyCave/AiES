@@ -61,13 +61,14 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
 #' # Interactive mode: process .tiff images with GUI dialogs
 #' # NOTE: This example requires a GUI environment for interactive folder selection.
+#' if（interactive（））{
 #' axQnt(imprtImg = TRUE, expSip = TRUE)
-#'
+#' }
 #'
 #' # Utilize package-included image folder and output to temporary directory
+#' \donttest{
 #' img_dir <- system.file("extdata", "Degenerate_Images", package = "AiES")
 #' svm_model <- system.file("extdata", "svm_example_model.svm", package = "AiES")
 #' axQnt(imprtImg = TRUE, svm_model_path = svm_model, input_dirs = img_dir, output_dir = tempdir())
@@ -96,9 +97,9 @@ axQnt <- function(imprtImg = TRUE,
                   resizeW = 900,
                   binaryImg = FALSE,
                   expSip = TRUE,
-                  svm_model_path = NULL,
+                  svm_model_path = tempdir(),
                   input_dirs = NULL,
-                  output_dir = NULL){
+                  output_dir = tempdir()){
 
     sdate <- Sys.Date()
     txtGroup <- c("Degenerate","Intact")
