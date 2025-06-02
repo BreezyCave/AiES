@@ -63,7 +63,7 @@
 #' @examples
 #' # Interactive mode: process .tiff images with GUI dialogs
 #' # NOTE: This example requires a GUI environment for interactive folder selection.
-#' if（interactive（））{
+#' if (interactive()){
 #' axQnt(imprtImg = TRUE, expSip = TRUE)
 #' }
 #'

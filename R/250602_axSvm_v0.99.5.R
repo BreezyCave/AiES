@@ -75,7 +75,7 @@
 #' @examples
 #' # Interactive mode with GUI prompts
 #' # NOTE: This example requires a GUI environment for interactive folder selection.
-#' if（interactive（））{
+#' if (interactive()){
 #' axSvm()
 #' }
 #'

@@ -1,7 +1,7 @@
 Package: AiES
 Type: Package
 Title: Axon Integrity Evaluation System: Quantitative Analysis of Axon Integrity and Degeneration in Microscopy Images
-Version: 0.99.4
+Version: 0.99.5
 Authors@R: c(
   person("Shinji", "Tokunaga", email = "tokunaga@ncnp.go.jp", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8398-3054")),
   person("Masafumi", "Funakoshi", email = "funakoshi@ncnp.go.jp", role = "ctb"),
@@ -9,8 +9,8 @@ Authors@R: c(
   )
 Maintainer: Shinji Tokunaga <tokunaga@ncnp.go.jp>
 Description: Description: AiES provides a workflow for the quantitative analysis of axon integrity in microscopy images. 
-It implements image pre-processing, adaptive thresholding, feature extraction, and SVM-based classification to compute indices such as the Axon Integrity Index (AII) and Degeneration Index (DI).
-The package is designed for reproducible and automated analysis in neuroscience research.
+  It implements image pre-processing, adaptive thresholding, feature extraction, and SVM-based classification to compute indices such as the Axon Integrity Index (AII) and Degeneration Index (DI).
+  The package is designed for reproducible and automated analysis in neuroscience research.
 License: BSD_3_clause + file LICENSE
 Copyright: 2025 National Center of Neurology and Psychiatry
 Encoding: UTF-8

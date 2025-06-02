@@ -64,7 +64,7 @@
 #' # Basic usage with default parameters
 #' # Exports only features needed for SVM learning
 #' # NOTE: This example requires a GUI environment for interactive folder selection.
-#' if（interactive（））{
+#' if (interactive()){
 #' axDistmap()
 #' }
 #'
