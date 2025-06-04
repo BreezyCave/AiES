@@ -138,7 +138,7 @@ See each package’s CRAN/Bioconductor page for full license texts.
 
 If you use AiES in your research, please cite:
 
-Tokunaga S, Funakoshim M, Araki T, et al. AiES: Axon integrity Evaluation System. National Center of Neurology and Psychiatry, 2025.
+Tokunaga S, Funakoshim M, Araki T (2025). AiES: Axon Integrity Evaluation System. R package version 0.99.5. https://github.com/BreezyCave/AiES
 
 
 ## Contact
