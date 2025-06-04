@@ -1,6 +1,6 @@
 Package: AiES
 Type: Package
-Title: Axon Integrity Evaluation System: Quantitative Analysis of Axon Integrity and Degeneration in Microscopy Images
+Title: Axon Integrity Evaluation System for R
 Version: 0.99.6
 Authors@R: c(
   person("Shinji", "Tokunaga", email = "tokunaga@ncnp.go.jp", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8398-3054")),
