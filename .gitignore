@@ -5,3 +5,5 @@
 /doc/
 /Meta/
 AiES.BiocCheck/
+*.Rcheck
+AiES_*.tar.gz
