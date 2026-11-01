@@ -9,7 +9,7 @@ Authors@R: c(
     person("National Center of Neurology and Psychiatry", role = "cph")
     )
 Description: Provides tools for the quantitative analysis of axon integrity
-    in phase-contrast microscopy images. AiES (Axon integrity Evaluation
+    in phase-contrast microscopy images. 'AiES' (Axon integrity Evaluation
     System) implements image pre-processing, adaptive thresholding, feature
     extraction, and support vector machine-based classification to compute
     indices such as the Axon Integrity Index (AII) and Degeneration Index
