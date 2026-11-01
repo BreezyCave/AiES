@@ -1,0 +1,244 @@
+---
+title: "Introduction to AiES: Axon integrity Evaluation System"
+author: "Shinji Tokunaga, Masabumi Funakoshi, Toshiyuki Araki"
+email: tokunaga@ncnp.go.jp
+package: AiES
+abstract: 
+ AiES is a free and open-source R package for (high-throughput) axonal integrity analysis of micrographs such as murine dorsal root ganglia explant cultures. AiES offers tools to segment neurites, extract morphological features, generate SVM models, and quantify axon integrity. AiES is available under the 3-Clause BSD license. 
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+graphics: yes
+vignette: >
+  %\VignetteIndexEntry{AiES Introduction}
+  %\VignetteKeywords{image processing, visualization}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Introduction
+
+The AiES package provides an integrated workflow for **axon image analysis**, including feature extraction, machine learning classification, and quantitative assessment.  
+The main functions are:
+
+- `axDistmap()`: Processes image files (TIFF) to create distance maps and optionally binary images. It also computes various morphological features and exports them as a text file.
+- `axSvm()`: Trains a Support Vector Machine (SVM) classifier to distinguish between degenerative and intact axon states using morphological feature data. 
+- `axQnt()`: Quantifies the Axon Integrity Index (AII) and Degeneration Index (DI) using one of the two built-in models or a model trained with `axSvm()`.
+
+AiES is designed for phase-contrast images in which axons appear darker than the background.
+Images are resampled to the scale at which the built-in models were trained (0.791746 &micro;m per pixel), so the pixel size of the input should be known.
+See `?AiES` for supported and not recommended image formats.
+
+# Typical Workflow
+
+## 1. Feature Extraction from Images (`axDistmap`)
+
+The `axDistmap()` function creates distance maps and, optionally, binary images from TIFF image files, and extracts the features used for classification.
+
+```r
+library(AiES)
+
+# Specify the sample image folders included in the package
+img_dir1 <- system.file("extdata", "Degenerate_Images", package = "AiES")
+img_dir2 <- system.file("extdata", "Intact_Images", package = "AiES")
+
+# The sample images are 900 px wide (0.791746 um per pixel)
+axDistmap(
+  folder_paths = c(img_dir1, img_dir2),  # multiple folders supported
+  pixelSize = 0.791746,                  # pixel size of the input images (um)
+  output_path = tempdir()
+)
+```
+
+This function processes all TIFF files in each folder, including subfolders.
+For each input folder, a subfolder `<folder>_<date>_output_files` is created in `output_path`.
+It contains, for each image:
+
+- A feature table (`<image>_<date>_ImageData.txt`) with the features required by the built-in models, under short names (e.g., `Ras`, `ENT`; see "Feature names" in `?axDistmap`)
+- A distance map image
+- A binary image (optional, `binaryImg = TRUE`)
+
+and one parameter file (`<folder>_<date>_Parameters.csv`) recording the properties of each image and the scale at which it was analyzed.
+
+If `pixelSize` is omitted, the pixel size is read from the file metadata (OME-XML or TIFF resolution tags).
+If it cannot be determined, the image is resized to a fixed width (`resizeW`), and a warning is issued.
+
+## 2. Building an SVM Classifier (`axSvm`)
+
+The `axSvm()` function builds an SVM model using the extracted features.
+
+```r
+# Specify feature data folders
+Degenerate_dir <- system.file("extdata", "Degenerate_txt", package = "AiES")
+Intact_dir <- system.file("extdata", "Intact_txt", package = "AiES")
+
+# Train an SVM classifier on the feature set of the built-in g0.1_APA model
+axSvm(
+  model = "g0.1_APA",
+  degenerate_path = Degenerate_dir,
+  intact_path = Intact_dir,
+  output_data_path = tempdir(),
+  output_model_path = tempdir()
+)
+```
+
+With `model = "g0.1_APA"` or `"g0.2_ACC"`, the features and hyperparameters of the corresponding built-in model are used.
+By default, up to 12 images per group and up to 1000 objects per image are sampled randomly with `seed = 1`, which corresponds to the conditions used for training the built-in models.
+Set `maxNumImg = NULL` and `maxNumObj = NULL` to use all data.
+
+This function generates:
+
+- An extracted data file for machine learning
+- A trained SVM model file. If the `*_Parameters.csv` file written by `axDistmap()` is found next to the input data, the scale of the training data is recorded with the model.
+
+## 3. Quantitative Analysis (`axQnt`)
+
+The `axQnt()` function uses a built-in model, or a model trained with `axSvm()`, to calculate the Axon Integrity Index and Degeneration Index for new image data.
+
+```r
+# Quantify AII/DI with the built-in g0.1_APA model
+result <- axQnt(
+  model = "g0.1_APA",                  # or "g0.2_ACC"
+  input_dirs = c(img_dir1, img_dir2),  # multiple folders supported
+  pixelSize = 0.791746,
+  output_dir = tempdir()
+)
+
+# Visualize the results
+hist(result$AxonIntegrityIndex, breaks = seq(0, 1, 0.1),
+     main = "AII distribution", xlab = "Axon Integrity Index")
+```
+
+This function generates:
+
+- `Summary_<date>.csv` in `output_dir`: AII and DI for every image of every input folder (`FileName` is the path relative to the input folder)
+- One subfolder per input folder (`<folder>_<date>_output_files`) containing the summary of that folder, its parameter file, and (optional) single image prediction files
+
+# Advanced Usage
+
+## Built-in models
+
+| Model | Features | gamma | cost |
+|---|---|---|---|
+| `g0.1_APA` (recommended) | Ras, ENT, Per, SVA, SV2 | 0.0871 | 1.189 |
+| `g0.2_ACC` | CON, ecc, mjx, cir, Ras, Ran | 0.207 | 1.110 |
+
+In the model names, "g0.1" and "g0.2" refer to the gamma value held fixed during forward feature selection.
+The gamma listed above is the final value after a local grid search, which is why the two differ.
+
+## Pixel size and image formats
+
+The pixel size is taken from, in order of priority:
+
+1. The `pixelSize` argument (recommended, because metadata formats differ between manufacturers)
+2. The file metadata: OME-XML (OME-TIFF), TIFF resolution tags, or ImageJ calibration
+
+If both the argument and the metadata are available, the argument is used, and a warning reports both values.
+The pixel size can be computed as the camera pixel pitch divided by the product of the objective and camera-adapter magnifications.
+OME-TIFF files also record the bit depth of the camera (e.g., 12-bit data in a 16-bit file), which is corrected automatically.
+
+Phase-contrast images recorded with a color camera can be analyzed with `colorMode = "rgb"`, which averages the three channels:
+
+```r
+# e.g., 6.45 um pixel pitch, 20x objective, 0.5x camera adapter: 6.45 / (20 * 0.5) = 0.645
+axDistmap(
+  folder_paths = "path/to/rgb_images",
+  pixelSize = 0.645,
+  colorMode = "rgb",
+  output_path = tempdir()
+)
+```
+
+The same arguments are accepted by `axQnt()`.
+If an image is analyzed at a scale different from that of the model (e.g., when its pixel size is unknown), `axQnt()` issues a warning at the end of the run.
+
+## Exporting all features
+
+```r
+# Export all EBImage features plus circularity (cir)
+axDistmap(
+  folder_paths = img_dir1,
+  pixelSize = 0.791746,
+  featureSet = "all",
+  output_path = tempdir()
+)
+```
+
+## Training and applying a custom model
+
+For images acquired with a different modality, objective or camera, a classifier trained on your own data is expected to be more accurate.
+Run `axDistmap()` on your own Degenerate and Intact images, then train a model with `model = "custom"` and apply it with `axQnt(svm_model_path = )`.
+
+```r
+# Replace Degenerate_dir / Intact_dir with the folders of your own feature tables
+my_model <- file.path(tempdir(), "my_model.svm")
+axSvm(
+  model = "custom",
+  features = c("Ras", "ENT", "cir"),
+  degenerate_path = Degenerate_dir,
+  intact_path = Intact_dir,
+  output_data_path = tempdir(),
+  output_model_path = my_model
+)
+
+# Apply the custom model
+axQnt(
+  svm_model_path = my_model,
+  input_dirs = c(img_dir1, img_dir2),
+  pixelSize = 0.791746,
+  output_dir = tempdir()
+)
+```
+
+`features` accepts either short names (e.g., `"Ras"`) or the original EBImage names (e.g., `"s.radius.sd"`).
+To choose from all features, export them with `featureSet = "all"` in `axDistmap()`.
+If `nCst` and `nGmm` are not given, `model = "custom"` uses cost = 1 and gamma = 0.1.
+
+## Sampling and reproducibility
+
+Because `seed = 1` by default, identical input always produces identical training data, and the random number state of the R session is restored afterward.
+Use a different seed to assess how sensitive the model is to sampling variability, or use all data:
+
+```r
+# Different random sample
+axSvm(model = "g0.1_APA", degenerate_path = Degenerate_dir, intact_path = Intact_dir,
+      seed = 2, output_data_path = tempdir(), output_model_path = tempdir())
+
+# All images and all objects
+axSvm(model = "g0.1_APA", degenerate_path = Degenerate_dir, intact_path = Intact_dir,
+      maxNumImg = NULL, maxNumObj = NULL,
+      output_data_path = tempdir(), output_model_path = tempdir())
+```
+
+## Quantifying from feature tables
+
+`axQnt()` can also use the feature tables exported by `axDistmap()` instead of images:
+
+```r
+txt_dir <- system.file("extdata", "Degenerate_txt", package = "AiES")
+axQnt(model = "g0.1_APA", imprtImg = FALSE, input_dirs = txt_dir, output_dir = tempdir())
+```
+
+# Upgrading from AiES 0.99.x
+
+- Features are exported under short names (e.g., `s.radius.sd` is now `Ras`). Feature tables written by earlier versions are converted automatically, but tables exported with the earlier default settings lack features required by the built-in models. Re-run `axDistmap()` on the images.
+- The `allFeatures` argument of `axDistmap()` has been replaced by `featureSet` (`"standard"` or `"all"`).
+- The old example model (`svm_example_model.svm`) has been replaced by two built-in models, `g0.1_APA` (recommended) and `g0.2_ACC`, so AII and DI differ from those of version 0.99.x. Models trained with earlier versions can still be applied with `axQnt(svm_model_path = )`.
+- `axSvm()` now samples the training data by default (see "Sampling and reproducibility").
+
+See `NEWS.md` for the full list of changes.
+
+# Summary
+
+With AiES, you can perform **feature extraction, machine learning, and quantitative analysis** in a seamless workflow.  
+For more details, see the help pages for each function (e.g., `?AiES`, `?axDistmap`, `?axSvm`, `?axQnt`).
+
+# Source code and issues
+
+You can find the development version of AiES on [GitHub](https://github.com/BreezyCave/AiES).
+
+For bug reports and feature requests, please use the [GitHub Issues page](https://github.com/BreezyCave/AiES/issues).

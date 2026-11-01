@@ -1,0 +1,140 @@
+# Copyright 2025 National Center of Neurology and Psychiatry
+# BSD 3-Clause License (see LICENSE file)
+#' AiES: Axon Integrity Evaluation System
+#'
+#' @description
+#' AiES quantifies axon integrity and degeneration from microscopy images. Axonal regions are
+#' segmented, described by shape, moment and Haralick texture features, and classified as intact or
+#' degenerate by a support vector machine. The package provides three functions:
+#' \itemize{
+#'   \item \code{\link{axDistmap}}: segments images and exports feature tables.
+#'   \item \code{\link{axSvm}}: trains a classifier on your own feature tables.
+#'   \item \code{\link{axQnt}}: applies a classifier and reports the Axon Integrity Index (AII) and
+#'         Degeneration Index (DI).
+#' }
+#' Two built-in models are provided ("g0.1_APA" and "g0.2_ACC").
+#' Whether they can be applied to your images depends on how those images were acquired and saved.
+#' This page describes which inputs are supported.
+#'
+#' @section How AiES sees an image:
+#' Three properties of the input determine whether the segmentation behaves as it did for the
+#' images the built-in models were trained on:
+#' \enumerate{
+#'   \item \strong{Polarity.} Axons are segmented as structures that are \emph{darker} than their
+#'         local surroundings, as they appear in phase-contrast images.
+#'   \item \strong{Intensity range.} The first processing step is a contrast curve centered on
+#'         half of the full intensity range. The training images were 8-bit and used the full
+#'         0-255 range. Images must therefore occupy the full range of their file format once read.
+#'   \item \strong{Physical scale.} Every size-dependent parameter was defined at 0.791746 um per
+#'         pixel. Images are resampled to this scale by default, which requires the pixel size of the
+#'         input to be known.
+#' }
+#'
+#' @section Recommended input:
+#' The following inputs can be analyzed with the built-in models without further adjustment.
+#' \itemize{
+#'   \item \strong{Imaging modality:} phase contrast, 20x objective, in which axons appear darker
+#'         than the background. This is how the built-in models were trained.
+#'   \item \strong{File type:} TIFF (\code{.tif} / \code{.tiff}), uncompressed or losslessly
+#'         compressed (e.g. LZW). Only TIFF files are searched for.
+#'   \item \strong{OME-TIFF (preferred):} files exported with OME-XML metadata (for example from
+#'         Nikon NIS-Elements or Bio-Formats) carry both the pixel size and the bit depth of the
+#'         camera, which are read automatically.
+#'   \item \strong{Channels:} a single grayscale channel.
+#'   \item \strong{Bit depth:} 8-bit data using the full 0-255 range, or higher bit depths that are
+#'         either declared in OME-XML (OME-TIFF) or scaled to the full range of the file format by
+#'         the acquisition software.
+#'   \item \strong{Pixel size:} known, and equal to or finer than 0.791746 um per pixel. Finer
+#'         images are resampled down to this scale; coarser images would have to be interpolated
+#'         up, which cannot restore detail that was never recorded.
+#'   \item \strong{Processing history:} raw acquisitions. No contrast adjustment, auto-levels,
+#'         gamma correction, sharpening or denoising.
+#' }
+#'
+#' @section Supported with additional arguments:
+#' \itemize{
+#'   \item \strong{Pixel size:} set \code{pixelSize} to the physical size of one pixel in
+#'         micrometers. This is required when the file does not store it, and recommended in
+#'         general, because metadata formats differ between manufacturers. If the file also carries
+#'         a pixel size, the value you specify is used and a warning reports both. It can be
+#'         computed as the camera pixel pitch divided by the product of the objective and
+#'         camera-adapter magnifications.
+#'   \item \strong{Color camera images (RGB):} set \code{colorMode = "rgb"}. The three
+#'         channels are averaged into one grayscale image. This is the right choice for
+#'         phase-contrast images recorded with a color camera.
+#'   \item \strong{Grayscale saved as RGB} (three identical channels): the default
+#'         \code{colorMode = "gray"} uses the first channel, which loses nothing.
+#' }
+#'
+#' @section Applicable, but re-training is recommended:
+#' \itemize{
+#'   \item \strong{Other transmitted-light modalities} (bright field, DIC, other phase rings or
+#'         objectives): the built-in models can be applied to quantify degeneration, but the
+#'         contrast characteristics differ from the training images even at the same pixel size.
+#'         Re-training with \code{\link{axSvm}} on your own data is expected to improve accuracy.
+#' }
+#'
+#' @section Requires re-training with axSvm:
+#' The following inputs can be processed, but the built-in models should not be applied to them.
+#' Train a classifier on your own data with \code{\link{axSvm}} instead.
+#' \itemize{
+#'   \item \strong{Working at a finer scale than 0.791746 um per pixel}
+#'         (\code{targetPixelSize} smaller than the default): size-dependent parameters are rescaled
+#'         so that the segmentation stays sound, but perimeters, and therefore Circularity, grow as
+#'         finer boundary detail is resolved, so features are not numerically comparable.
+#' }
+#'
+#' @section Not supported:
+#' \itemize{
+#'   \item \strong{Fluorescence and immunostaining images.} Axons are bright on a dark background
+#'         in these images, the opposite polarity to phase contrast, and the preprocessing has not
+#'         been validated for them. Their results should not be interpreted.
+#' }
+#'
+#' @section Not recommended:
+#' \itemize{
+#'   \item \strong{Multi-frame TIFF files} (z-stacks, time series):
+#'         only the first frame is used.
+#'   \item \strong{Higher bit depth stored unscaled, without metadata} (e.g. 12-bit camera data
+#'         saved as a 16-bit TIFF, maximum value 4095): the image is read as if it were very dark,
+#'         and the segmentation changes completely. Export it as OME-TIFF, which records the
+#'         significant bits, or scale it to the full range in the acquisition software. A warning is
+#'         issued when an image uses less than 1/16 of its intensity range.
+#'   \item \strong{Lossy compression} (JPEG files, or TIFF files with JPEG compression):
+#'         compression artifacts alter the texture features.
+#'   \item \strong{Processed images:} contrast-stretched, auto-leveled, gamma-corrected, sharpened
+#'         or denoised images. The intensity distribution no longer matches the training data.
+#'   \item \strong{Annotations burned into the image:} scale bars, text or arrows are segmented as
+#'         objects. Export images without overlays.
+#'   \item \strong{Images coarser than 0.791746 um per pixel} (e.g. low-magnification objectives):
+#'         thin axons span too few pixels to be segmented reliably.
+#'   \item \strong{Stitched or tiled images} with visible seams or uneven illumination between
+#'         tiles.
+#'   \item \strong{Z-stacks and time series in one file:} only the first frame is analyzed.
+#'         Export each field of view as a separate file.
+#'   \item \strong{Binary masks:} detected automatically and skipped.
+#' }
+#'
+#' @section Quick reference:
+#' \itemize{
+#'   \item 8-bit grayscale TIFF, pixel size stored in file:
+#'         \code{axDistmap()}
+#'   \item 8-bit grayscale TIFF, pixel size not stored:
+#'         \code{axDistmap(pixelSize = ...)}
+#'   \item OME-TIFF (12- or 16-bit):
+#'         \code{axDistmap()} (pixel size and bit depth read automatically)
+#'   \item 12-bit data saved unscaled as 16-bit TIFF without metadata:
+#'         re-export as OME-TIFF, or scale to the full 16-bit range in the acquisition software
+#'   \item RGB TIFF from a color camera:
+#'         \code{axDistmap(pixelSize = ..., colorMode = "rgb")}
+#' }
+#' The same arguments are accepted by \code{\link{axQnt}} when \code{imprtImg = TRUE}.
+#'
+#' @section Checking an image before analysis:
+#' The log printed for each file reports the image dimensions, number of channels, container bit
+#' depth, the source of the pixel size, and any rescaling applied. Inspecting the binary output of
+#' \code{axDistmap(binaryImg = TRUE)} for a few representative images is the most direct way to
+#' confirm that axons, and not the background between them, are being segmented.
+#'
+#' @seealso \code{\link{axDistmap}}, \code{\link{axSvm}}, \code{\link{axQnt}}
+"_PACKAGE"

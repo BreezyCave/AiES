@@ -1,36 +1,42 @@
 Package: AiES
 Type: Package
 Title: Axon Integrity Evaluation System for Microscopy Images
-Version: 0.99.6
+Version: 1.0.0
 Authors@R: c(
-  person("Shinji", "Tokunaga", email = "tokunaga@ncnp.go.jp", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8398-3054")),
-  person("Masafumi", "Funakoshi", email = "funakoshi@ncnp.go.jp", role = "ctb"),
-  person("Toshiyuki", "Araki", email = "taraki@ncnp.go.jp", role = "ctb", comment = c(ORCID = "0000-0003-3625-2042"))
-  )
-Maintainer: Shinji Tokunaga <tokunaga@ncnp.go.jp>
-Description: Provides tools for the quantitative analysis of axon integrity in microscopy images. 
-  It implements image pre-processing, adaptive thresholding, feature extraction, and support vector machine-based classification to compute indices such as the Axon Integrity Index (AII) and Degeneration Index (DI).
-  The package is designed for reproducible and automated analysis in neuroscience research.
+    person("Shinji", "Tokunaga", email = "tokunaga@ncnp.go.jp", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8398-3054")),
+    person("Masabumi", "Funakoshi", email = "funakoshi@ncnp.go.jp", role = "ctb"),
+    person("Toshiyuki", "Araki", email = "taraki@ncnp.go.jp", role = "ctb", comment = c(ORCID = "0000-0003-3625-2042")),
+    person("National Center of Neurology and Psychiatry", role = "cph")
+    )
+Description: Provides tools for the quantitative analysis of axon integrity
+    in phase-contrast microscopy images. AiES (Axon integrity Evaluation
+    System) implements image pre-processing, adaptive thresholding, feature
+    extraction, and support vector machine-based classification to compute
+    indices such as the Axon Integrity Index (AII) and Degeneration Index
+    (DI). Two built-in models are provided, and classifiers can be re-trained
+    on user data. The package is designed for reproducible and automated
+    analysis in neuroscience research.
 License: BSD_3_clause + file LICENSE
 Copyright: 2025 National Center of Neurology and Psychiatry
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 URL: https://github.com/BreezyCave/AiES
 BugReports: https://github.com/BreezyCave/AiES/issues
-Imports: 
+Depends:
+    R (>= 3.6.0)
+Imports:
     EBImage,
     e1071,
     stats,
     fs,
-    data.table
-Suggests: 
     utils,
-    stringr,
-    colorspace,
-    dplyr,
-    knitr,
-    tcltk,
+    data.table,
     rstudioapi,
+    tiff
+Suggests:
+    knitr,
+    rmarkdown,
+    tcltk,
     svDialogs
 VignetteBuilder: knitr

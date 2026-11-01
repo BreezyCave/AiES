@@ -1,0 +1,17 @@
+bibentry(
+  bibtype = "Manual",
+  header  = "To cite AiES in publications, please use:",
+  title   = "AiES: Axon Integrity Evaluation System for Microscopy Images",
+  author  = c(
+    person("Shinji", "Tokunaga"),
+    person("Masabumi", "Funakoshi"),
+    person("Toshiyuki", "Araki")
+  ),
+  year    = "2026",
+  note    = paste("R package version", meta$Version),
+  url     = "https://CRAN.R-project.org/package=AiES",
+  doi     = "10.32614/CRAN.package.AiES"
+)
+
+## After the paper is published, add a second bibentry() for it (bibtype = "Article")
+## and list it first, so that citation("AiES") shows the paper before the software.
