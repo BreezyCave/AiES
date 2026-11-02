@@ -1,4 +1,4 @@
-# AiES 1.0.0
+# AiES 1.0.1
 
 This is a major update. Feature names, arguments and outputs have changed, so please read "Breaking changes" before upgrading from version 0.99.x.
 
@@ -42,6 +42,7 @@ This is a major update. Feature names, arguments and outputs have changed, so pl
 
 ## Other changes
 
+* Sample images: a second image, with the pixel size recorded as an ImageJ calibration (micron) in the file metadata, was added to each of directories under /inst/extdata/.
 * R (>= 3.6.0) is required. The packages `tiff`, `rstudioapi` and `utils` are now in Imports.
 * The vignette is rewritten for the current functions and renamed `Introduction_to_AiES`.
 * The help pages of all functions are updated.

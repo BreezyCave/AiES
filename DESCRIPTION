@@ -1,7 +1,7 @@
 Package: AiES
 Type: Package
 Title: Axon Integrity Evaluation System for Microscopy Images
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: c(
     person("Shinji", "Tokunaga", email = "tokunaga@ncnp.go.jp", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8398-3054")),
     person("Masabumi", "Funakoshi", email = "funakoshi@ncnp.go.jp", role = "ctb"),

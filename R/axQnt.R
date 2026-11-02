@@ -48,7 +48,7 @@
 #'   \item "rgb": a true RGB color image, e.g. a phase-contrast image recorded with a color
 #'         camera. The three channels are averaged.
 #' }
-#' (default: "gray")
+#' A single-channel image is processed as is, whatever colorMode is. (default: "gray")
 #' @param binaryImg Logical. If TRUE, exports binary image files. (default: FALSE)
 #' In `axQnt`, the files are written as TIFF.
 #' @param distMapImg Logical. If TRUE, exports the distance map image of each file (the same image as

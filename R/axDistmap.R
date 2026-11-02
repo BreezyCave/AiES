@@ -96,9 +96,10 @@
 #' Depending on how a TIFF file was exported, the same field of view may be stored as a 2D grayscale
 #' array, a 3-channel RGB image, or a multi-frame stack. `axDistmap` reads every channel or frame,
 #' reports the detected structure, and then reduces the image to a single channel according to `colorMode`.
-#' "gray" (default) uses the first channel, while "rgb" averages the three channels. If "rgb" is selected
-#' but the image does not have exactly three channels, the file is skipped with a warning. Multi-frame
-#' files (z-stacks, time series) are not recommended, as only the first frame is analyzed.
+#' "gray" (default) uses the first channel, while "rgb" averages the three channels.  A single-channel image is
+#' processed as is, whatever colorMode is. If "rgb" is selected but the image does not have exactly one or three
+#' channels, the file is skipped with a warning. Multi-frame files (z-stacks, time series) are not recommended,
+#' as only the first frame is analyzed.
 #'
 #' @section Feature Export:
 #' All features are exported under short names (see section "Feature names"), which are the names used
